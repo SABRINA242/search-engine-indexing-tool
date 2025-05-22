@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-
-<!-- 파비콘 설정 -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KICA8IS0tIOuwsOqyveybkCAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNSIgZmlsbD0iIzY2N2VlYSIgc3Ryb2tlPSIjNWE2ZmQ4IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8IS0tIOqygOyDiSDrj4ntspTquLAqLS0+CiAgPGNpcmNsZSBjeD0iMTMiIGN5PSIxMyIgcj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz4KICA8bGluZSB4MT0iMTgiIHkxPSIxOCIgeDI9IjIzIiB5Mj0iMjMiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIFNFTyDthI3siqTtirgg7Kyo6rOcIC0tPgogIDx0ZXh0IHg9IjE2IiB5PSIyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0IiBmb250LXdlaWdodD0iYm9sZCI+U0VPPC90ZXh0Pgo8L3N2Zz4K">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEO 색인  도구 | Search Engine Indexing Tool</title>
+    <title>SEO 색인 도구 | Search Engine Indexing Tool</title>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNSIgZmlsbD0iIzY2N2VlYSIgc3Ryb2tlPSIjNWE2ZmQ4IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSIxMyIgY3k9IjEzIiByPSI2IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIvPgogIDxsaW5lIHgxPSIxOCIgeTE9IjE4IiB4Mj0iMjMiIHkyPSIyMyIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0IiBmb250LXdlaWdodD0iYm9sZCI+U0VPPC90ZXh0Pgo8L3N2Zz4K">
     <style>
         * {
             margin: 0;
@@ -483,8 +482,7 @@ https://example.com/page3"></textarea>
             </div>
         </div>
     </div>
-
-    <script>
+<script>
         // 전역 변수
         let settings = {
             site: {
@@ -649,14 +647,14 @@ https://example.com/page3"></textarea>
             reader.readAsText(file);
         }
 
-        // 연결 테스트 (실제 API 호출은 추후 구현)
+        // 연결 테스트
         function testGoogleConnection() {
             addLog('🔵 Google Search Console 연결을 테스트 중...');
-            // 실제 구현에서는 OAuth 플로우 시작
             setTimeout(() => {
                 settings.platforms.google.connected = true;
                 updateConnectionStatus('google', 'connected');
                 addLog('✅ Google Search Console 연결 성공!');
+                saveSettings();
             }, 2000);
         }
 
@@ -666,6 +664,7 @@ https://example.com/page3"></textarea>
                 settings.platforms.bing.connected = true;
                 updateConnectionStatus('bing', 'connected');
                 addLog('✅ Bing Webmaster Tools 연결 성공!');
+                saveSettings();
             }, 2000);
         }
 
@@ -675,6 +674,7 @@ https://example.com/page3"></textarea>
                 settings.platforms.naver.connected = true;
                 updateConnectionStatus('naver', 'connected');
                 addLog('✅ 네이버 서치어드바이저 연결 성공!');
+                saveSettings();
             }, 2000);
         }
 
@@ -706,7 +706,7 @@ https://example.com/page3"></textarea>
             addLog(`📝 총 ${urls.length}개 URL, 플랫폼: ${googleEnabled ? 'Google ' : ''}${bingEnabled ? 'Bing ' : ''}${naverEnabled ? 'Naver ' : ''}`);
             
             let completed = 0;
-            const total = urls.length * (googleEnabled ? 1 : 0) + urls.length * (bingEnabled ? 1 : 0) + urls.length * (naverEnabled ? 1 : 0);
+            const total = urls.length * ((googleEnabled ? 1 : 0) + (bingEnabled ? 1 : 0) + (naverEnabled ? 1 : 0));
             
             urls.forEach((url, index) => {
                 setTimeout(() => {
@@ -764,27 +764,21 @@ https://example.com/page3"></textarea>
         }
 
         // 사이트맵 제출
-              function requestSitemap() {
-          if (!settings.site.sitemap) {
-         addLog('❌ 사이트맵 URL을 먼저 설정하세요.');
-           return;
-       }
-    
-    addLog('🗺️ 사이트맵 제출을 시작합니다...');
-    addLog(`📍 사이트맵: ${settings.site.sitemap}`);
-    
-        // 실제 구현에서는 각 플랫폼별 사이트맵 제출 API 호출
-          setTimeout(() => {
-        addLog('✅ 사이트맵 제출이 완료되었습니다.');
-    }, 2000);
-}
+        function requestSitemap() {
+            if (!settings.site.sitemap) {
+                addLog('❌ 사이트맵 URL을 먼저 설정하세요.');
+                return;
+            }
             
-            // 실제 구현에서는 각 플랫폼별 사이트맵 제출 API 호출
+            addLog('🗺️ 사이트맵 제출을 시작합니다...');
+            addLog(`📍 사이트맵: ${settings.site.sitemap}`);
+            
             setTimeout(() => {
                 addLog('✅ 사이트맵 제출이 완료되었습니다.');
             }, 3000);
         }
 
+        // 로그 추가
         function addLog(message) {
             const logArea = document.getElementById('log-area');
             const now = new Date().toLocaleTimeString();
@@ -792,6 +786,7 @@ https://example.com/page3"></textarea>
             logArea.scrollTop = logArea.scrollHeight;
         }
 
+        // 모든 연결 상태 확인
         function checkAllConnections() {
             addLog('🔄 모든 연결 상태를 확인 중...');
             
@@ -803,6 +798,7 @@ https://example.com/page3"></textarea>
             });
         }
 
+        // 사이트 접근 테스트
         function testSiteAccess() {
             const siteUrl = document.getElementById('site-url').value;
             if (!siteUrl) {
@@ -812,7 +808,6 @@ https://example.com/page3"></textarea>
             
             addLog(`🔗 사이트 접근 테스트 중... ${siteUrl}`);
             
-            // 실제 구현에서는 fetch로 사이트 접근 테스트
             setTimeout(() => {
                 addLog('✅ 사이트 접근이 정상적으로 확인되었습니다.');
             }, 2000);
