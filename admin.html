@@ -376,6 +376,48 @@
                     text-decoration: underline;
                 }
 
+               /* 기존 style 태그 안에 이 CSS를 추가하세요 */
+
+/* 백업 상태 메시지 스타일 */
+.backup-status {
+    background: #e3f2fd;
+    border: 1px solid #2196f3;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.backup-status.success {
+    background: #e8f5e8;
+    border-color: #4caf50;
+    color: #2e7d32;
+}
+
+.backup-status.error {
+    background: #ffeaea;
+    border-color: #f44336;
+    color: #c62828;
+}
+
+.backup-status.loading {
+    background: #fff3e0;
+    border-color: #ff9800;
+    color: #ef6c00;
+}
+
+/* 드라이브 연결 상태 스타일 (이미 있을 수 있음) */
+.drive-connected {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.drive-disconnected {
+    color: #dc3545;
+    font-weight: bold;
+}
+
                 /* 가이드 섹션 스타일 */
                 .collapsible-header {
                     display: flex;
