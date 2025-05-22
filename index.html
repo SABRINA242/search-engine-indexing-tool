@@ -764,25 +764,20 @@ https://example.com/page3"></textarea>
         }
 
         // 사이트맵 제출
-        function requestSitemap() {
-            if (!settings.site.sitemap) {
-                addLog('❌ 사이트맵 URL을 먼저 설정하세요.');
-                return;
-            }
-            
-            addLog('🗺️ 사이트맵 제출을 시작합니다...');
-            addLog(`📍 사이트맵: ${settings.site.sitemap}`);
- }, 2000);
-        }
-
-        function requestSitemap() {
-            if (!settings.site.sitemap) {
-                addLog('❌ 사이트맵 URL을 먼저 설정하세요.');
-                return;
-            }
-            
-            addLog('🗺️ 사이트맵 제출을 시작합니다...');
-            addLog(`📍 사이트맵: ${settings.site.sitemap}`);
+              function requestSitemap() {
+          if (!settings.site.sitemap) {
+         addLog('❌ 사이트맵 URL을 먼저 설정하세요.');
+           return;
+       }
+    
+    addLog('🗺️ 사이트맵 제출을 시작합니다...');
+    addLog(`📍 사이트맵: ${settings.site.sitemap}`);
+    
+        // 실제 구현에서는 각 플랫폼별 사이트맵 제출 API 호출
+          setTimeout(() => {
+        addLog('✅ 사이트맵 제출이 완료되었습니다.');
+    }, 2000);
+}
             
             // 실제 구현에서는 각 플랫폼별 사이트맵 제출 API 호출
             setTimeout(() => {
