@@ -1,4 +1,28 @@
-<!DOCTYPE html>
+// 백업 상태 메시지 업데이트
+function updateBackupStatus(message, type = 'info') {
+    const statusElement = document.getElementById('backupStatus');
+    if (statusElement) {
+        statusElement.textContent = message;
+        statusElement.className = 'backup-status';
+        
+        if (type === 'success') {
+            statusElement.classList.add('success');
+        } else if (type === 'error') {
+            statusElement.classList.add('error');
+        } else if (type === 'loading') {
+            statusElement.classList.add('loading');
+        }
+    }
+}
+
+// 드라이브 상태 업데이트
+function updateDriveStatus(status) {
+    const statusElement = document.getElementById('driveStatus');
+    if (statusElement) {
+        statusElement.textContent = status;
+        statusElement.className = (status === '로그인됨' || status === '연결됨') ? 'drive-connected' : 'drive-disconnected';
+    }
+}<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -652,62 +676,47 @@
                 </div>
             </div>
                  
-            <!-- 구글 드라이브 백업 섹션 -->
+            <!-- 로컬 백업 섹션 -->
             <div class="admin-section">
-                <h3>☁️ 구글 드라이브 백업</h3>
+                <h3>💾 데이터 백업</h3>
                 
-                <div class="drive-status">
-                    <div class="status-item">
-                        <span>드라이브 연결 상태:</span>
-                        <span id="driveStatus" class="drive-disconnected">연결 안됨</span>
-                    </div>
-                    <div class="status-item">
-                        <span>자동 백업:</span>
-                        <span id="autoBackupStatus">설정 확인 중...</span>
-                    </div>
-                </div>
-
-                <!-- 백업 상태 메시지 -->
-                <div id="backupStatus" class="backup-status">
-                    백업 기능을 사용하려면 먼저 구글 드라이브에 연결하세요.
+                <div class="backup-status">
+                    백업 기능을 사용하여 중요한 데이터를 안전하게 보관하세요.
                 </div>
                 
                 <div class="drive-actions">
-                    <button class="btn btn-primary" onclick="signInToDrive()">🔑 드라이브 로그인</button>
-                    <button class="btn btn-success" onclick="backupToGoogleDrive()" id="backupButton" disabled>☁️ 드라이브 백업</button>
-                    <button class="btn btn-info" onclick="exportMembersToGoogleDrive()" id="exportButton" disabled>📤 멤버목록 업로드</button>
+                    <button class="btn btn-success" onclick="backupToLocal()">📥 데이터 백업 다운로드</button>
+                    <button class="btn btn-info" onclick="exportMembersToLocal()">📄 멤버 목록 다운로드</button>
                 </div>
                 
-                <div class="drive-settings">
+                <div class="backup-info" style="margin-top: 15px; background: #e7f3ff; padding: 15px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <h4>💡 로컬 백업 안내</h4>
+                    <ul>
+                        <li>✅ 백업 파일은 <b>D:\색인 관리자 백업</b> 폴더에 저장하는 것을 권장합니다.</li>
+                        <li>✅ JSON 형식으로 데이터가 보관됩니다.</li>
+                        <li>✅ 일주일에 한 번씩 자동 백업 알림이 표시됩니다.</li>
+                        <li>✅ 정기적인 백업을 통해 데이터 손실을 방지하세요.</li>
+                    </ul>
+                    <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                        <div><strong>마지막 백업 날짜:</strong> <span id="lastBackupDate">없음</span></div>
+                        <div><strong>다음 예정 백업 날짜:</strong> <span id="nextBackupDate">없음</span></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
                     <button class="btn btn-secondary" id="autoBackupBtn" onclick="toggleAutoBackup()">
                         ⏸️ 자동백업 꺼짐
                     </button>
-                    <button class="btn btn-secondary" onclick="openDriveBackupFolder()">📁 백업폴더 열기</button>
                 </div>
                 
-                <div class="drive-info">
-                    <h4>💡 구글 드라이브 백업 장점</h4>
-                    <ul>
-                        <li>✅ 자동 클라우드 백업 (15GB 무료)</li>
-                        <li>✅ 언제 어디서나 접근 가능</li>
-                        <li>✅ 버전 관리 자동</li>
-                        <li>✅ 실수로 삭제해도 복구 가능</li>
-                        <li>✅ "SEO도구백업" 폴더에 정리</li>
-                    </ul>
-                </div>
-                
-                <div class="drive-setup" style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 8px;">
-                    <h4>⚙️ 드라이브 API 설정 (최초 1회)</h4>
-                    <p><small>
-                        1. <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a> 접속<br>
-                        2. Drive API 활성화<br>
-                        3. OAuth 클라이언트 ID 생성<br>
-                        4. 아래 JavaScript 코드에서 API 키 설정<br>
-                        <br>
-                        <strong>⚠️ 설정 필요:</strong><br>
-                        <code>const DRIVE_CLIENT_ID = '실제-클라이언트-ID';</code><br>
-                        <code>const BACKUP_FOLDER_ID = '1cYBfIxSffRcHzBONnxgaNVXxTF_FF4GQ';</code>
-                    </small></p>
+                <div class="recent-activity">
+                    <h4>최근 백업 이력</h4>
+                    <div id="backupHistory">
+                        <div class="activity-item">
+                            <span>아직 백업 이력이 없습니다.</span>
+                            <span class="activity-time">-</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
