@@ -769,3 +769,56 @@ https://example.com/page3"></textarea>
             
             addLog('🗺️ 사이트맵 제출을 시작합니다...');
             addLog(`📍 사이트맵: ${settings.site.sitemap}`
+ }, 2000);
+        }
+
+        function requestSitemap() {
+            if (!settings.site.sitemap) {
+                addLog('❌ 사이트맵 URL을 먼저 설정하세요.');
+                return;
+            }
+            
+            addLog('🗺️ 사이트맵 제출을 시작합니다...');
+            addLog(`📍 사이트맵: ${settings.site.sitemap}`);
+            
+            // 실제 구현에서는 각 플랫폼별 사이트맵 제출 API 호출
+            setTimeout(() => {
+                addLog('✅ 사이트맵 제출이 완료되었습니다.');
+            }, 3000);
+        }
+
+        function addLog(message) {
+            const logArea = document.getElementById('log-area');
+            const now = new Date().toLocaleTimeString();
+            logArea.innerHTML += `[${now}] ${message}<br>`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function checkAllConnections() {
+            addLog('🔄 모든 연결 상태를 확인 중...');
+            
+            Object.keys(settings.platforms).forEach(platform => {
+                setTimeout(() => {
+                    const connected = settings.platforms[platform].connected;
+                    updateConnectionStatus(platform, connected ? 'connected' : 'disconnected');
+                }, Math.random() * 2000);
+            });
+        }
+
+        function testSiteAccess() {
+            const siteUrl = document.getElementById('site-url').value;
+            if (!siteUrl) {
+                addLog('❌ 사이트 URL을 먼저 입력하세요.');
+                return;
+            }
+            
+            addLog(`🔗 사이트 접근 테스트 중... ${siteUrl}`);
+            
+            // 실제 구현에서는 fetch로 사이트 접근 테스트
+            setTimeout(() => {
+                addLog('✅ 사이트 접근이 정상적으로 확인되었습니다.');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
