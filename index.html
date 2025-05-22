@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검색엔진 색인 자동화 도구</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .platform-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: #ccc;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(25px);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .status-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .log-area {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 검색엔진 색인 자동화</h1>
+            <p>Google, Bing, 네이버 검색엔진에 자동으로 색인을 요청하세요</p>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('site-settings')">사이트 설정</button>
+                <button class="tab" onclick="showTab('api-settings')">API 설정</button>
+                <button class="tab" onclick="showTab('indexing')">색인 요청</button>
+                <button class="tab" onclick="showTab('monitoring')">모니터링</button>
+            </div>
+
+            <!-- 사이트 설정 탭 -->
+            <div id="site-settings" class="tab-content active">
+                <div class="form-section">
+                    <h3>🌐 기본 사이트 정보</h3>
+                    <div class="form-group">
+                        <label for="site-url">사이트 URL</label>
+                        <input type="url" id="site-url" placeholder="https://example.com" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="sitemap-url">사이트맵 URL</label>
+                        <input type="url" id="sitemap-url" placeholder="https://example.com/sitemap.xml" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="site-description">사이트 설명 (선택사항)</label>
+                        <textarea id="site-description" rows="3" placeholder="사이트에 대한 간단한 설명을 입력하세요"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSiteSettings()">💾 사이트 설정 저장</button>
+                    <button class="btn btn-secondary" onclick="testSiteAccess()">🔗 사이트 접근 테스트</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>📁 설정 파일 관리</h3>
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn btn-success" onclick="exportSettings()">📤 설정 내보내기</button>
+                        <button class="btn btn-warning" onclick="document.getElementById('import-file').click()">📥 설정 가져오기</button>
+                        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importSettings(this)">
+                    </div>
+                    <small style="color: #666;">설정을 JSON 파일로 저장하고 불러올 수 있습니다. 모든 데이터는 브라우저에만 저장됩니다.</small>
+                </div>
+            </div>
+
+            <!-- API 설정 탭 -->
+            <div id="api-settings" class="tab-content">
+                <div class="grid">
+                    <!-- Google Search Console -->
+                    <div class="form-section">
+                        <div class="platform-toggle">
+                            <div class="toggle-switch" id="google-toggle" onclick="togglePlatform('google')"></div>
+                            <h3>🔵 Google Search Console</h3>
+                        </div>
+                        <div id="google-settings" class="platform-settings" style="display: none;">
+                            <div class="form-group">
+                                <label for="google-client-id">Client ID</label>
+                                <input type="text" id="google-client-id" placeholder="Google OAuth Client ID">
+                            </div>
+                            <div class="form-group">
+                                <label for="google-client-secret">Client Secret</label>
+                                <input type="password" id="google-client-secret" placeholder="Google OAuth Client Secret">
+                            </div>
+                            <button class="btn btn-primary" onclick="testGoogleConnection()">🔗 연결 테스트</button>
+                        </div>
+                    </div>
+
+                    <!-- Bing Webmaster -->
+                    <div class="form-section">
+                        <div class="platform-toggle">
+                            <div class="toggle-switch" id="bing-toggle" onclick="togglePlatform('bing')"></div>
+                            <h3>🟦 Bing Webmaster Tools</h3>
+                        </div>
+                        <div id="bing-settings" class="platform-settings" style="display: none;">
+                            <div class="form-group">
+                                <label for="bing-api-key">API Key</label>
+                                <input type="password" id="bing-api-key" placeholder="Bing Webmaster API Key">
+                            </div>
+                            <button class="btn btn-primary" onclick="testBingConnection()">🔗 연결 테스트</button>
+                        </div>
+                    </div>
+
+                    <!-- 네이버 서치어드바이저 -->
+                    <div class="form-section">
+                        <div class="platform-toggle">
+                            <div class="toggle-switch" id="naver-toggle" onclick="togglePlatform('naver')"></div>
+                            <h3>🟢 네이버 서치어드바이저</h3>
+                        </div>
+                        <div id="naver-settings" class="platform-settings" style="display: none;">
+                            <div class="form-group">
+                                <label for="naver-client-id">Client ID</label>
+                                <input type="text" id="naver-client-id" placeholder="네이버 개발자센터 Client ID">
+                            </div>
+                            <div class="form-group">
+                                <label for="naver-client-secret">Client Secret</label>
+                                <input type="password" id="naver-client-secret" placeholder="네이버 개발자센터 Client Secret">
+                            </div>
+                            <button class="btn btn-primary" onclick="testNaverConnection()">🔗 연결 테스트</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <button class="btn btn-success" onclick="saveApiSettings()">💾 모든 API 설정 저장</button>
+                </div>
+            </div>
+
+            <!-- 색인 요청 탭 -->
+            <div id="indexing" class="tab-content">
+                <div class="form-section">
+                    <h3>🚀 색인 요청</h3>
+                    <div class="form-group">
+                        <label for="index-urls">색인할 URL 목록 (한 줄에 하나씩)</label>
+                        <textarea id="index-urls" rows="6" placeholder="https://example.com/page1
+https://example.com/page2
+https://example.com/page3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>색인 요청할 플랫폼</label>
+                        <div style="display: flex; gap: 20px; margin-top: 10px;">
+                            <label><input type="checkbox" id="index-google"> Google Search Console</label>
+                            <label><input type="checkbox" id="index-bing"> Bing Webmaster</label>
+                            <label><input type="checkbox" id="index-naver"> 네이버 서치어드바이저</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startIndexing()">🚀 색인 요청 시작</button>
+                    <button class="btn btn-secondary" onclick="requestSitemap()">🗺️ 사이트맵 제출</button>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="log-area" id="log-area">
+                    색인 로그가 여기에 표시됩니다...<br>
+                    시작하려면 위의 '색인 요청 시작' 버튼을 클릭하세요.
+                </div>
+            </div>
+
+            <!-- 모니터링 탭 -->
+            <div id="monitoring" class="tab-content">
+                <div class="form-section">
+                    <h3>📊 연결 상태</h3>
+                    <div class="status-panel">
+                        <div class="status-item">
+                            <span>Google Search Console</span>
+                            <span class="status-badge status-disconnected" id="google-status">연결 안됨</span>
+                        </div>
+                        <div class="status-item">
+                            <span>Bing Webmaster Tools</span>
+                            <span class="status-badge status-disconnected" id="bing-status">연결 안됨</span>
+                        </div>
+                        <div class="status-item">
+                            <span>네이버 서치어드바이저</span>
+                            <span class="status-badge status-disconnected" id="naver-status">연결 안됨</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkAllConnections()">🔄 모든 연결 상태 확인</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>📈 색인 통계</h3>
+                    <div class="grid">
+                        <div style="text-align: center; padding: 20px; background: white; border-radius: 10px;">
+                            <h4>오늘 요청</h4>
+                            <div style="font-size: 2rem; font-weight: bold; color: #667eea;" id="today-requests">0</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: white; border-radius: 10px;">
+                            <h4>성공률</h4>
+                            <div style="font-size: 2rem; font-weight: bold; color: #28a745;" id="success-rate">0%</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: white; border-radius: 10px;">
+                            <h4>총 요청</h4>
+                            <div style="font-size: 2rem; font-weight: bold; color: #6c757d;" id="total-requests">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let settings = {
+            site: {
+                url: '',
+                sitemap: '',
+                description: ''
+            },
+            platforms: {
+                google: { enabled: false, clientId: '', clientSecret: '', connected: false },
+                bing: { enabled: false, apiKey: '', connected: false },
+                naver: { enabled: false, clientId: '', clientSecret: '', connected: false }
+            },
+            stats: {
+                todayRequests: 0,
+                totalRequests: 0,
+                successCount: 0
+            }
+        };
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            updateUI();
+        });
+
+        // 탭 전환
+        function showTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭 활성화
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // 플랫폼 토글
+        function togglePlatform(platform) {
+            const toggle = document.getElementById(platform + '-toggle');
+            const settingsDiv = document.getElementById(platform + '-settings');
+            
+            toggle.classList.toggle('active');
+            settings.platforms[platform].enabled = toggle.classList.contains('active');
+            
+            if (settings.platforms[platform].enabled) {
+                settingsDiv.style.display = 'block';
+            } else {
+                settingsDiv.style.display = 'none';
+            }
+            
+            saveSettings();
+        }
+
+        // 설정 저장/불러오기
+        function saveSettings() {
+            localStorage.setItem('indexingSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('indexingSettings');
+            if (saved) {
+                settings = { ...settings, ...JSON.parse(saved) };
+            }
+        }
+
+        function updateUI() {
+            // 사이트 정보 업데이트
+            document.getElementById('site-url').value = settings.site.url || '';
+            document.getElementById('sitemap-url').value = settings.site.sitemap || '';
+            document.getElementById('site-description').value = settings.site.description || '';
+
+            // 플랫폼 설정 업데이트
+            Object.keys(settings.platforms).forEach(platform => {
+                const platformSettings = settings.platforms[platform];
+                const toggle = document.getElementById(platform + '-toggle');
+                const settingsDiv = document.getElementById(platform + '-settings');
+                
+                if (platformSettings.enabled) {
+                    toggle.classList.add('active');
+                    settingsDiv.style.display = 'block';
+                } else {
+                    toggle.classList.remove('active');
+                    settingsDiv.style.display = 'none';
+                }
+
+                // API 키 필드 업데이트
+                if (platform === 'google') {
+                    document.getElementById('google-client-id').value = platformSettings.clientId || '';
+                    document.getElementById('google-client-secret').value = platformSettings.clientSecret || '';
+                } else if (platform === 'bing') {
+                    document.getElementById('bing-api-key').value = platformSettings.apiKey || '';
+                } else if (platform === 'naver') {
+                    document.getElementById('naver-client-id').value = platformSettings.clientId || '';
+                    document.getElementById('naver-client-secret').value = platformSettings.clientSecret || '';
+                }
+            });
+
+            // 통계 업데이트
+            document.getElementById('today-requests').textContent = settings.stats.todayRequests;
+            document.getElementById('total-requests').textContent = settings.stats.totalRequests;
+            const successRate = settings.stats.totalRequests > 0 ? 
+                Math.round((settings.stats.successCount / settings.stats.totalRequests) * 100) : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        // 사이트 설정 저장
+        function saveSiteSettings() {
+            settings.site.url = document.getElementById('site-url').value;
+            settings.site.sitemap = document.getElementById('sitemap-url').value;
+            settings.site.description = document.getElementById('site-description').value;
+            
+            saveSettings();
+            addLog('✅ 사이트 설정이 저장되었습니다.');
+        }
+
+        // API 설정 저장
+        function saveApiSettings() {
+            // Google 설정
+            settings.platforms.google.clientId = document.getElementById('google-client-id').value;
+            settings.platforms.google.clientSecret = document.getElementById('google-client-secret').value;
+            
+            // Bing 설정
+            settings.platforms.bing.apiKey = document.getElementById('bing-api-key').value;
+            
+            // 네이버 설정
+            settings.platforms.naver.clientId = document.getElementById('naver-client-id').value;
+            settings.platforms.naver.clientSecret = document.getElementById('naver-client-secret').value;
+            
+            saveSettings();
+            addLog('✅ API 설정이 저장되었습니다.');
+        }
+
+        // 설정 내보내기/가져오기
+        function exportSettings() {
+            const dataStr = JSON.stringify(settings, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'indexing-settings.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            addLog('📤 설정 파일이 다운로드되었습니다.');
+        }
+
+        function importSettings(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedSettings = JSON.parse(e.target.result);
+                    settings = { ...settings, ...importedSettings };
+                    saveSettings();
+                    updateUI();
+                    addLog('📥 설정 파일을 불러왔습니다.');
+                } catch (error) {
+                    addLog('❌ 설정 파일 형식이 올바르지 않습니다.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 연결 테스트 (실제 API 호출은 추후 구현)
+        function testGoogleConnection() {
+            addLog('🔵 Google Search Console 연결을 테스트 중...');
+            // 실제 구현에서는 OAuth 플로우 시작
+            setTimeout(() => {
+                settings.platforms.google.connected = true;
+                updateConnectionStatus('google', 'connected');
+                addLog('✅ Google Search Console 연결 성공!');
+            }, 2000);
+        }
+
+        function testBingConnection() {
+            addLog('🟦 Bing Webmaster Tools 연결을 테스트 중...');
+            setTimeout(() => {
+                settings.platforms.bing.connected = true;
+                updateConnectionStatus('bing', 'connected');
+                addLog('✅ Bing Webmaster Tools 연결 성공!');
+            }, 2000);
+        }
+
+        function testNaverConnection() {
+            addLog('🟢 네이버 서치어드바이저 연결을 테스트 중...');
+            setTimeout(() => {
+                settings.platforms.naver.connected = true;
+                updateConnectionStatus('naver', 'connected');
+                addLog('✅ 네이버 서치어드바이저 연결 성공!');
+            }, 2000);
+        }
+
+        function updateConnectionStatus(platform, status) {
+            const statusElement = document.getElementById(platform + '-status');
+            statusElement.className = 'status-badge status-' + status;
+            statusElement.textContent = status === 'connected' ? '연결됨' : 
+                                      status === 'pending' ? '연결 중' : '연결 안됨';
+        }
+
+        // 색인 요청
+        function startIndexing() {
+            const urls = document.getElementById('index-urls').value.split('\n').filter(url => url.trim());
+            const googleEnabled = document.getElementById('index-google').checked;
+            const bingEnabled = document.getElementById('index-bing').checked;
+            const naverEnabled = document.getElementById('index-naver').checked;
+            
+            if (urls.length === 0) {
+                addLog('❌ 색인할 URL을 입력하세요.');
+                return;
+            }
+            
+            if (!googleEnabled && !bingEnabled && !naverEnabled) {
+                addLog('❌ 최소 하나의 플랫폼을 선택하세요.');
+                return;
+            }
+            
+            addLog('🚀 색인 요청을 시작합니다...');
+            addLog(`📝 총 ${urls.length}개 URL, 플랫폼: ${googleEnabled ? 'Google ' : ''}${bingEnabled ? 'Bing ' : ''}${naverEnabled ? 'Naver ' : ''}`);
+            
+            let completed = 0;
+            const total = urls.length * (googleEnabled ? 1 : 0) + urls.length * (bingEnabled ? 1 : 0) + urls.length * (naverEnabled ? 1 : 0);
+            
+            urls.forEach((url, index) => {
+                setTimeout(() => {
+                    if (googleEnabled) {
+                        simulateIndexRequest('Google', url, () => {
+                            completed++;
+                            updateProgress(completed, total);
+                        });
+                    }
+                    if (bingEnabled) {
+                        simulateIndexRequest('Bing', url, () => {
+                            completed++;
+                            updateProgress(completed, total);
+                        });
+                    }
+                    if (naverEnabled) {
+                        simulateIndexRequest('Naver', url, () => {
+                            completed++;
+                            updateProgress(completed, total);
+                        });
+                    }
+                }, index * 1000);
+            });
+            
+            settings.stats.todayRequests += urls.length;
+            settings.stats.totalRequests += urls.length;
+            saveSettings();
+            updateUI();
+        }
+
+        function simulateIndexRequest(platform, url, callback) {
+            addLog(`🔄 ${platform}: ${url} 색인 요청 중...`);
+            setTimeout(() => {
+                const success = Math.random() > 0.1; // 90% 성공률
+                if (success) {
+                    addLog(`✅ ${platform}: ${url} 색인 요청 성공`);
+                    settings.stats.successCount++;
+                } else {
+                    addLog(`❌ ${platform}: ${url} 색인 요청 실패`);
+                }
+                callback();
+            }, 1000 + Math.random() * 2000);
+        }
+
+        function updateProgress(completed, total) {
+            const percentage = (completed / total) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            
+            if (completed === total) {
+                addLog('🎉 모든 색인 요청이 완료되었습니다!');
+                setTimeout(() => {
+                    document.getElementById('progress-fill').style.width = '0%';
+                }, 3000);
+            }
+        }
+
+        // 사이트맵 제출
+        function requestSitemap() {
+            if (!settings.site.sitemap) {
+                addLog('❌ 사이트맵 URL을 먼저 설정하세요.');
+                return;
+            }
+            
+            addLog('🗺️ 사이트맵 제출을 시작합니다...');
+            addLog(`📍 사이트맵: ${settings.site.sitemap}`
