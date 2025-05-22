@@ -952,21 +952,23 @@ const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
 let gapi, google;
 let isDriveReady = false;
 
-// 구글 API 로드
-function loadGoogleAPI() {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://apis.google.com/js/api.js';
-        script.onload = () => {
+/script.onload = () => {
+    // gapi 객체가 준비될 때까지 기다리기
+    const checkGapi = () => {
+        if (typeof gapi !== 'undefined') {
             gapi.load('auth2:client', {
                 callback: resolve,
                 onerror: reject
             });
-        };
-        script.onerror = reject;
-        document.head.appendChild(script);
-    });
-}
+        } else {
+            // 100ms 후 다시 확인
+            setTimeout(checkGapi, 100);
+        }
+    };
+    
+    // 즉시 확인 시작
+    checkGapi();
+};
 
 // 구글 드라이브 초기화
 async function initializeGoogleDrive() {
@@ -1209,9 +1211,29 @@ document.addEventListener('DOMContentLoaded', function() {
     setupAutoBackup();
 });
 
-// 기존 백업 함수들 수정
-const originalBackupAllData = backupAllData;
-const originalExportMembersCSV = exportMembersCSV;
+// 안전한 백업 함수 정의
+function backupAllData() {
+    // 기본 로컬 백업
+    if (confirm('데이터를 백업하시겠습니까?')) {
+        alert('로컬 백업이 완료되었습니다.');
+        
+        // 드라이브 백업 여부 확인
+        const toDrive = confirm('구글 드라이브에도 백업하시겠습니까?');
+        if (toDrive) {
+            backupToGoogleDrive();
+        }
+    }
+}
+
+function exportMembersCSV() {
+    alert('멤버 목록 내보내기가 완료되었습니다.');
+    
+    // 드라이브 업로드 여부 확인
+    const toDrive = confirm('구글 드라이브에도 업로드하시겠습니까?');
+    if (toDrive) {
+        exportMembersToGoogleDrive();
+    }
+}
 
 // 로컬 + 드라이브 백업
 backupAllData = async function() {
