@@ -445,6 +445,267 @@
         </div>
     </div>
 
+<!-- API 설정 가이드 섹션 (접이식) -->
+            <div class="admin-section">
+                <div class="collapsible-header" onclick="toggleGuide()">
+                    <h3>📚 API 설정 가이드 (멤버 안내용)</h3>
+                    <span class="toggle-icon" id="guideToggle">▼</span>
+                </div>
+                
+                <div class="collapsible-content" id="guideContent" style="display: none;">
+                    
+                    <!-- Google Search Console -->
+                    <div class="guide-section">
+                        <h4>🔵 Google Search Console API 발급</h4>
+                        <div class="guide-steps">
+                            <div class="step">
+                                <strong>1단계:</strong> Google Cloud Console 접속<br>
+                                <code>https://console.cloud.google.com</code>
+                                <button class="copy-btn" onclick="copyText('https://console.cloud.google.com')">복사</button>
+                            </div>
+                            <div class="step">
+                                <strong>2단계:</strong> 새 프로젝트 생성<br>
+                                <small>프로젝트 이름: "SEO 색인 도구" (원하는 이름)</small>
+                            </div>
+                            <div class="step">
+                                <strong>3단계:</strong> API 라이브러리에서 Search Console API 활성화<br>
+                                <small>좌측 메뉴 → API 및 서비스 → 라이브러리 → "Search Console" 검색</small>
+                            </div>
+                            <div class="step">
+                                <strong>4단계:</strong> OAuth 클라이언트 ID 생성<br>
+                                <small>사용자 인증 정보 → 사용자 인증 정보 만들기 → OAuth 클라이언트 ID</small>
+                            </div>
+                            <div class="step">
+                                <strong>5단계:</strong> 웹 애플리케이션 선택 후 설정<br>
+                                <strong>승인된 리디렉션 URI:</strong><br>
+                                <code>https://sabrina242.github.io/search-engine-indexing-tool</code>
+                                <button class="copy-btn" onclick="copyText('https://sabrina242.github.io/search-engine-indexing-tool')">복사</button>
+                            </div>
+                            <div class="step">
+                                <strong>6단계:</strong> Client ID와 Client Secret 복사 보관
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bing Webmaster Tools -->
+                    <div class="guide-section">
+                        <h4>🟦 Bing Webmaster Tools API 발급</h4>
+                        <div class="guide-steps">
+                            <div class="step">
+                                <strong>1단계:</strong> Bing Webmaster Tools 접속<br>
+                                <code>https://www.bing.com/webmasters</code>
+                                <button class="copy-btn" onclick="copyText('https://www.bing.com/webmasters')">복사</button>
+                            </div>
+                            <div class="step">
+                                <strong>2단계:</strong> Microsoft 계정으로 로그인
+                            </div>
+                            <div class="step">
+                                <strong>3단계:</strong> 사이트 추가 및 소유권 확인
+                            </div>
+                            <div class="step">
+                                <strong>4단계:</strong> API 액세스 키 요청<br>
+                                <small>설정 → API 키 관리에서 발급</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 네이버 서치어드바이저 -->
+                    <div class="guide-section">
+                        <h4>🟢 네이버 서치어드바이저 API 발급</h4>
+                        <div class="guide-steps">
+                            <div class="step">
+                                <strong>1단계:</strong> 네이버 개발자센터 접속<br>
+                                <code>https://developers.naver.com</code>
+                                <button class="copy-btn" onclick="copyText('https://developers.naver.com')">복사</button>
+                            </div>
+                            <div class="step">
+                                <strong>2단계:</strong> 네이버 계정 로그인
+                            </div>
+                            <div class="step">
+                                <strong>3단계:</strong> 애플리케이션 등록<br>
+                                <small>Application → 애플리케이션 등록</small>
+                            </div>
+                            <div class="step">
+                                <strong>4단계:</strong> 서비스 API 선택<br>
+                                <small>검색 → 서치어드바이저 API 선택</small>
+                            </div>
+                            <div class="step">
+                                <strong>5단계:</strong> Client ID와 Client Secret 발급
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 멤버용 안내문 -->
+                    <div class="guide-section">
+                        <h4>📋 카톡방 공유용 안내문</h4>
+                        <textarea id="memberInstructions" rows="15" readonly>
+🔧 SEO 색인 도구 API 설정 방법
+
+📌 Google Search Console API 발급:
+1. https://console.cloud.google.com 접속
+2. 새 프로젝트 생성
+3. API 라이브러리 → Search Console API 활성화
+4. OAuth 클라이언트 ID 생성 (웹 애플리케이션)
+5. 리디렉션 URI: https://sabrina242.github.io/search-engine-indexing-tool
+6. Client ID, Secret 복사
+
+📌 Bing Webmaster Tools:
+1. https://www.bing.com/webmasters 접속
+2. 사이트 추가 후 API 키 발급
+
+📌 네이버 서치어드바이저:
+1. https://developers.naver.com 접속
+2. 애플리케이션 등록 → 서치어드바이저 API
+3. Client ID, Secret 발급
+
+❓ 어려우시면 카톡방에서 개별 문의하세요!
+                        </textarea>
+                        <button class="copy-btn" onclick="copyInstructions()">📋 전체 안내문 복사</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CSS 추가 (기존 style 태그 안에 넣기) -->
+            <style>
+                .collapsible-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                    padding: 10px 0;
+                    border-bottom: 2px solid #dc3545;
+                }
+
+                .collapsible-header:hover {
+                    background: rgba(220, 53, 69, 0.1);
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin: -10px;
+                }
+
+                .toggle-icon {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    color: #dc3545;
+                    transition: transform 0.3s ease;
+                }
+
+                .toggle-icon.rotated {
+                    transform: rotate(180deg);
+                }
+
+                .collapsible-content {
+                    margin-top: 20px;
+                }
+
+                .guide-section {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    border-left: 4px solid #007bff;
+                }
+
+                .guide-section h4 {
+                    color: #007bff;
+                    margin-bottom: 15px;
+                    font-size: 1.2rem;
+                }
+
+                .guide-steps {
+                    margin-left: 10px;
+                }
+
+                .step {
+                    margin-bottom: 15px;
+                    padding: 10px;
+                    background: #f8f9fa;
+                    border-radius: 5px;
+                    border-left: 3px solid #28a745;
+                }
+
+                .step strong {
+                    color: #28a745;
+                }
+
+                .step code {
+                    background: #e9ecef;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-family: 'Courier New', monospace;
+                    color: #dc3545;
+                }
+
+                .step small {
+                    color: #6c757d;
+                    display: block;
+                    margin-top: 5px;
+                }
+
+                .copy-btn {
+                    background: #17a2b8;
+                    color: white;
+                    border: none;
+                    padding: 4px 8px;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    font-size: 0.8rem;
+                    margin-left: 10px;
+                }
+
+                .copy-btn:hover {
+                    background: #138496;
+                }
+
+                #memberInstructions {
+                    width: 100%;
+                    background: #f8f9fa;
+                    border: 2px solid #dc3545;
+                    border-radius: 5px;
+                    padding: 15px;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9rem;
+                    line-height: 1.4;
+                    resize: vertical;
+                }
+            </style>
+
+            <!-- JavaScript 추가 (기존 script 태그 안에 넣기) -->
+            <script>
+                // 가이드 접기/펼치기
+                function toggleGuide() {
+                    const content = document.getElementById('guideContent');
+                    const icon = document.getElementById('guideToggle');
+                    
+                    if (content.style.display === 'none') {
+                        content.style.display = 'block';
+                        icon.textContent = '▲';
+                        icon.classList.add('rotated');
+                    } else {
+                        content.style.display = 'none';
+                        icon.textContent = '▼';
+                        icon.classList.remove('rotated');
+                    }
+                }
+
+                // 텍스트 복사
+                function copyText(text) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        alert('복사되었습니다: ' + text);
+                    });
+                }
+
+                // 전체 안내문 복사
+                function copyInstructions() {
+                    const instructions = document.getElementById('memberInstructions').value;
+                    navigator.clipboard.writeText(instructions).then(function() {
+                        alert('전체 안내문이 복사되었습니다!\n카톡방에 붙여넣기 하세요.');
+                    });
+                }
+            </script>
+
+
     <script>
         // 관리자 로그인
         function adminLogin() {
