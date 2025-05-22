@@ -998,14 +998,21 @@ function initializeGoogleDrive() {
  
 
                 // 클라이언트 초기화
-                await gapi.client.init({
-                    clientId: DRIVE_CLIENT_ID,
-                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-                    scope: DRIVE_SCOPES
-                });
+await gapi.client.init({
+    clientId: DRIVE_CLIENT_ID,
+    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+    scope: DRIVE_SCOPES
+});
 
-                authInstance = gapi.auth2.getAuthInstance();
-                gapiInited = true;
+// Google Identity Service 초기화
+google.accounts.id.initialize({
+    client_id: DRIVE_CLIENT_ID,
+    callback: handleCredentialResponse,
+    auto_select: false
+});
+
+updateBackupStatus('✅ Google API 준비 완료. 로그인해주세요.', 'info');
+updateDriveStatus('준비됨');
 
                 // 자동 로그인 체크
                 if (authInstance.isSignedIn.get()) {
