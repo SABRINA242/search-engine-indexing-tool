@@ -294,6 +294,77 @@
             font-size: 0.8rem;
             color: #6c757d;
         }
+      
+         .drive-status {
+                    background: white;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                    border: 2px solid #17a2b8;
+                }
+
+                .drive-connected {
+                    color: #28a745;
+                    font-weight: bold;
+                }
+
+                .drive-disconnected {
+                    color: #dc3545;
+                    font-weight: bold;
+                }
+
+                .drive-actions, .drive-settings {
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 15px;
+                    flex-wrap: wrap;
+                }
+
+                .drive-info {
+                    background: #e7f3ff;
+                    padding: 15px;
+                    border-radius: 8px;
+                    border-left: 4px solid #17a2b8;
+                }
+
+                .drive-info h4 {
+                    color: #17a2b8;
+                    margin-bottom: 10px;
+                }
+
+                .drive-info ul {
+                    margin: 0;
+                    padding-left: 20px;
+                }
+
+                .drive-info li {
+                    margin-bottom: 5px;
+                    color: #495057;
+                }
+
+                .drive-setup {
+                    border-left: 4px solid #ffc107;
+                }
+
+                .drive-setup h4 {
+                    color: #856404;
+                    margin-bottom: 10px;
+                }
+
+                .drive-setup a {
+                    color: #856404;
+                    text-decoration: underline;
+                }
+
+                @media (max-width: 768px) {
+                    .drive-actions, .drive-settings {
+                        flex-direction: column;
+                    }
+                    
+                    .drive-actions button, .drive-settings button {
+                        width: 100%;
+                    }
+                }
     </style>
 </head>
 <body>
@@ -425,6 +496,56 @@
                     <button class="btn btn-secondary" onclick="viewLogs()">📋 로그 보기</button>
                     <button class="btn btn-danger" onclick="emergencyStop()">🚨 긴급 정지</button>
                 </div>
+                 
+                <!-- 구글 드라이브 백업 섹션 (시스템 관리 섹션 다음에 추가) -->
+            <div class="admin-section">
+                <h3>☁️ 구글 드라이브 백업</h3>
+                
+                <div class="drive-status">
+                    <div class="status-item">
+                        <span>드라이브 연결 상태:</span>
+                        <span id="driveStatus" class="drive-disconnected">연결 안됨</span>
+                    </div>
+                    <div class="status-item">
+                        <span>자동 백업:</span>
+                        <span id="autoBackupStatus">설정 확인 중...</span>
+                    </div>
+                </div>
+                
+                <div class="drive-actions">
+                    <button class="btn btn-primary" onclick="signInToDrive()">🔑 드라이브 로그인</button>
+                    <button class="btn btn-success" onclick="backupToGoogleDrive()">☁️ 드라이브 백업</button>
+                    <button class="btn btn-info" onclick="exportMembersToGoogleDrive()">📤 멤버목록 업로드</button>
+                </div>
+                
+                <div class="drive-settings">
+                    <button class="btn btn-secondary" id="autoBackupBtn" onclick="toggleAutoBackup()">
+                        ⏸️ 자동백업 꺼짐
+                    </button>
+                    <button class="btn btn-secondary" onclick="openDriveBackupFolder()">📁 백업폴더 열기</button>
+                </div>
+                
+                <div class="drive-info">
+                    <h4>💡 구글 드라이브 백업 장점</h4>
+                    <ul>
+                        <li>✅ 자동 클라우드 백업 (15GB 무료)</li>
+                        <li>✅ 언제 어디서나 접근 가능</li>
+                        <li>✅ 버전 관리 자동</li>
+                        <li>✅ 실수로 삭제해도 복구 가능</li>
+                        <li>✅ "SEO도구백업" 폴더에 정리</li>
+                    </ul>
+                </div>
+                
+                <div class="drive-setup" style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                    <h4>⚙️ 드라이브 API 설정 (최초 1회)</h4>
+                    <p><small>
+                        1. <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a> 접속<br>
+                        2. Drive API 활성화<br>
+                        3. OAuth 클라이언트 ID 생성<br>
+                        4. 위 JavaScript 코드에서 API 키 설정
+                    </small></p>
+                </div>
+            </div>
                 
                 <div class="recent-activity">
                     <h4>최근 활동 로그</h4>
@@ -444,267 +565,6 @@
             </div>
         </div>
     </div>
-
-<!-- API 설정 가이드 섹션 (접이식) -->
-            <div class="admin-section">
-                <div class="collapsible-header" onclick="toggleGuide()">
-                    <h3>📚 API 설정 가이드 (멤버 안내용)</h3>
-                    <span class="toggle-icon" id="guideToggle">▼</span>
-                </div>
-                
-                <div class="collapsible-content" id="guideContent" style="display: none;">
-                    
-                    <!-- Google Search Console -->
-                    <div class="guide-section">
-                        <h4>🔵 Google Search Console API 발급</h4>
-                        <div class="guide-steps">
-                            <div class="step">
-                                <strong>1단계:</strong> Google Cloud Console 접속<br>
-                                <code>https://console.cloud.google.com</code>
-                                <button class="copy-btn" onclick="copyText('https://console.cloud.google.com')">복사</button>
-                            </div>
-                            <div class="step">
-                                <strong>2단계:</strong> 새 프로젝트 생성<br>
-                                <small>프로젝트 이름: "SEO 색인 도구" (원하는 이름)</small>
-                            </div>
-                            <div class="step">
-                                <strong>3단계:</strong> API 라이브러리에서 Search Console API 활성화<br>
-                                <small>좌측 메뉴 → API 및 서비스 → 라이브러리 → "Search Console" 검색</small>
-                            </div>
-                            <div class="step">
-                                <strong>4단계:</strong> OAuth 클라이언트 ID 생성<br>
-                                <small>사용자 인증 정보 → 사용자 인증 정보 만들기 → OAuth 클라이언트 ID</small>
-                            </div>
-                            <div class="step">
-                                <strong>5단계:</strong> 웹 애플리케이션 선택 후 설정<br>
-                                <strong>승인된 리디렉션 URI:</strong><br>
-                                <code>https://sabrina242.github.io/search-engine-indexing-tool</code>
-                                <button class="copy-btn" onclick="copyText('https://sabrina242.github.io/search-engine-indexing-tool')">복사</button>
-                            </div>
-                            <div class="step">
-                                <strong>6단계:</strong> Client ID와 Client Secret 복사 보관
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bing Webmaster Tools -->
-                    <div class="guide-section">
-                        <h4>🟦 Bing Webmaster Tools API 발급</h4>
-                        <div class="guide-steps">
-                            <div class="step">
-                                <strong>1단계:</strong> Bing Webmaster Tools 접속<br>
-                                <code>https://www.bing.com/webmasters</code>
-                                <button class="copy-btn" onclick="copyText('https://www.bing.com/webmasters')">복사</button>
-                            </div>
-                            <div class="step">
-                                <strong>2단계:</strong> Microsoft 계정으로 로그인
-                            </div>
-                            <div class="step">
-                                <strong>3단계:</strong> 사이트 추가 및 소유권 확인
-                            </div>
-                            <div class="step">
-                                <strong>4단계:</strong> API 액세스 키 요청<br>
-                                <small>설정 → API 키 관리에서 발급</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 네이버 서치어드바이저 -->
-                    <div class="guide-section">
-                        <h4>🟢 네이버 서치어드바이저 API 발급</h4>
-                        <div class="guide-steps">
-                            <div class="step">
-                                <strong>1단계:</strong> 네이버 개발자센터 접속<br>
-                                <code>https://developers.naver.com</code>
-                                <button class="copy-btn" onclick="copyText('https://developers.naver.com')">복사</button>
-                            </div>
-                            <div class="step">
-                                <strong>2단계:</strong> 네이버 계정 로그인
-                            </div>
-                            <div class="step">
-                                <strong>3단계:</strong> 애플리케이션 등록<br>
-                                <small>Application → 애플리케이션 등록</small>
-                            </div>
-                            <div class="step">
-                                <strong>4단계:</strong> 서비스 API 선택<br>
-                                <small>검색 → 서치어드바이저 API 선택</small>
-                            </div>
-                            <div class="step">
-                                <strong>5단계:</strong> Client ID와 Client Secret 발급
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 멤버용 안내문 -->
-                    <div class="guide-section">
-                        <h4>📋 카톡방 공유용 안내문</h4>
-                        <textarea id="memberInstructions" rows="15" readonly>
-🔧 SEO 색인 도구 API 설정 방법
-
-📌 Google Search Console API 발급:
-1. https://console.cloud.google.com 접속
-2. 새 프로젝트 생성
-3. API 라이브러리 → Search Console API 활성화
-4. OAuth 클라이언트 ID 생성 (웹 애플리케이션)
-5. 리디렉션 URI: https://sabrina242.github.io/search-engine-indexing-tool
-6. Client ID, Secret 복사
-
-📌 Bing Webmaster Tools:
-1. https://www.bing.com/webmasters 접속
-2. 사이트 추가 후 API 키 발급
-
-📌 네이버 서치어드바이저:
-1. https://developers.naver.com 접속
-2. 애플리케이션 등록 → 서치어드바이저 API
-3. Client ID, Secret 발급
-
-❓ 어려우시면 카톡방에서 개별 문의하세요!
-                        </textarea>
-                        <button class="copy-btn" onclick="copyInstructions()">📋 전체 안내문 복사</button>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- CSS 추가 (기존 style 태그 안에 넣기) -->
-            <style>
-                .collapsible-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    cursor: pointer;
-                    padding: 10px 0;
-                    border-bottom: 2px solid #dc3545;
-                }
-
-                .collapsible-header:hover {
-                    background: rgba(220, 53, 69, 0.1);
-                    padding: 10px;
-                    border-radius: 5px;
-                    margin: -10px;
-                }
-
-                .toggle-icon {
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                    color: #dc3545;
-                    transition: transform 0.3s ease;
-                }
-
-                .toggle-icon.rotated {
-                    transform: rotate(180deg);
-                }
-
-                .collapsible-content {
-                    margin-top: 20px;
-                }
-
-                .guide-section {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 8px;
-                    margin-bottom: 20px;
-                    border-left: 4px solid #007bff;
-                }
-
-                .guide-section h4 {
-                    color: #007bff;
-                    margin-bottom: 15px;
-                    font-size: 1.2rem;
-                }
-
-                .guide-steps {
-                    margin-left: 10px;
-                }
-
-                .step {
-                    margin-bottom: 15px;
-                    padding: 10px;
-                    background: #f8f9fa;
-                    border-radius: 5px;
-                    border-left: 3px solid #28a745;
-                }
-
-                .step strong {
-                    color: #28a745;
-                }
-
-                .step code {
-                    background: #e9ecef;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    font-family: 'Courier New', monospace;
-                    color: #dc3545;
-                }
-
-                .step small {
-                    color: #6c757d;
-                    display: block;
-                    margin-top: 5px;
-                }
-
-                .copy-btn {
-                    background: #17a2b8;
-                    color: white;
-                    border: none;
-                    padding: 4px 8px;
-                    border-radius: 3px;
-                    cursor: pointer;
-                    font-size: 0.8rem;
-                    margin-left: 10px;
-                }
-
-                .copy-btn:hover {
-                    background: #138496;
-                }
-
-                #memberInstructions {
-                    width: 100%;
-                    background: #f8f9fa;
-                    border: 2px solid #dc3545;
-                    border-radius: 5px;
-                    padding: 15px;
-                    font-family: 'Courier New', monospace;
-                    font-size: 0.9rem;
-                    line-height: 1.4;
-                    resize: vertical;
-                }
-            </style>
-
-            <!-- JavaScript 추가 (기존 script 태그 안에 넣기) -->
-            <script>
-                // 가이드 접기/펼치기
-                function toggleGuide() {
-                    const content = document.getElementById('guideContent');
-                    const icon = document.getElementById('guideToggle');
-                    
-                    if (content.style.display === 'none') {
-                        content.style.display = 'block';
-                        icon.textContent = '▲';
-                        icon.classList.add('rotated');
-                    } else {
-                        content.style.display = 'none';
-                        icon.textContent = '▼';
-                        icon.classList.remove('rotated');
-                    }
-                }
-
-                // 텍스트 복사
-                function copyText(text) {
-                    navigator.clipboard.writeText(text).then(function() {
-                        alert('복사되었습니다: ' + text);
-                    });
-                }
-
-                // 전체 안내문 복사
-                function copyInstructions() {
-                    const instructions = document.getElementById('memberInstructions').value;
-                    navigator.clipboard.writeText(instructions).then(function() {
-                        alert('전체 안내문이 복사되었습니다!\n카톡방에 붙여넣기 하세요.');
-                    });
-                }
-            </script>
-
 
     <script>
         // 관리자 로그인
@@ -821,6 +681,301 @@
                 alert('서비스가 긴급 정지되었습니다.');
             }
         }
+        // 구글 드라이브 연동 코드 (admin.html script 태그에 추가)
+
+// 구글 드라이브 API 설정
+const DRIVE_API_KEY = 'YOUR_GOOGLE_DRIVE_API_KEY'; // 관리자가 설정
+const DRIVE_CLIENT_ID = 'YOUR_GOOGLE_DRIVE_CLIENT_ID'; // 관리자가 설정
+const DRIVE_DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+let gapi, google;
+let isDriveReady = false;
+
+// 구글 API 로드
+function loadGoogleAPI() {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.onload = () => {
+            gapi.load('auth2:client', {
+                callback: resolve,
+                onerror: reject
+            });
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+// 구글 드라이브 초기화
+async function initializeGoogleDrive() {
+    try {
+        await loadGoogleAPI();
+        
+        await gapi.client.init({
+            apiKey: DRIVE_API_KEY,
+            clientId: DRIVE_CLIENT_ID,
+            discoveryDocs: [DRIVE_DISCOVERY_DOC],
+            scope: DRIVE_SCOPES
+        });
+        
+        isDriveReady = true;
+        updateDriveStatus('연결됨');
+        console.log('구글 드라이브 연결 성공');
+        
+    } catch (error) {
+        console.error('구글 드라이브 연결 실패:', error);
+        updateDriveStatus('연결 실패');
+    }
+}
+
+// 드라이브 상태 업데이트
+function updateDriveStatus(status) {
+    const statusElement = document.getElementById('driveStatus');
+    if (statusElement) {
+        statusElement.textContent = status;
+        statusElement.className = status === '연결됨' ? 'drive-connected' : 'drive-disconnected';
+    }
+}
+
+// 구글 드라이브 로그인
+async function signInToDrive() {
+    if (!isDriveReady) {
+        alert('구글 드라이브 API가 준비되지 않았습니다.');
+        return false;
+    }
+    
+    const authInstance = gapi.auth2.getAuthInstance();
+    
+    if (!authInstance.isSignedIn.get()) {
+        try {
+            await authInstance.signIn();
+            updateDriveStatus('로그인됨');
+            return true;
+        } catch (error) {
+            console.error('드라이브 로그인 실패:', error);
+            alert('구글 드라이브 로그인에 실패했습니다.');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// 백업 폴더 생성 또는 찾기
+async function getOrCreateBackupFolder() {
+    const folderName = 'SEO도구백업';
+    
+    // 기존 폴더 검색
+    const response = await gapi.client.drive.files.list({
+        q: `name='${folderName}' and mimeType='application/vnd.google-apps.folder'`,
+        fields: 'files(id, name)'
+    });
+    
+    if (response.result.files.length > 0) {
+        return response.result.files[0].id;
+    }
+    
+    // 폴더가 없으면 생성
+    const folderResponse = await gapi.client.drive.files.create({
+        resource: {
+            name: folderName,
+            mimeType: 'application/vnd.google-apps.folder'
+        }
+    });
+    
+    return folderResponse.result.id;
+}
+
+// 구글 드라이브에 파일 업로드
+async function uploadToDrive(content, fileName, mimeType = 'text/plain') {
+    if (!await signInToDrive()) {
+        return false;
+    }
+    
+    try {
+        // 백업 폴더 ID 가져오기
+        const folderId = await getOrCreateBackupFolder();
+        
+        // 파일 업로드
+        const boundary = '-------314159265358979323846';
+        const delimiter = "\r\n--" + boundary + "\r\n";
+        const close_delim = "\r\n--" + boundary + "--";
+        
+        const metadata = {
+            'name': fileName,
+            'parents': [folderId]
+        };
+        
+        const multipartRequestBody =
+            delimiter +
+            'Content-Type: application/json\r\n\r\n' +
+            JSON.stringify(metadata) +
+            delimiter +
+            'Content-Type: ' + mimeType + '\r\n\r\n' +
+            content +
+            close_delim;
+        
+        const request = gapi.client.request({
+            'path': 'https://www.googleapis.com/upload/drive/v3/files',
+            'method': 'POST',
+            'params': {'uploadType': 'multipart'},
+            'headers': {
+                'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+            },
+            'body': multipartRequestBody
+        });
+        
+        const response = await request;
+        
+        if (response.status === 200) {
+            addActivityLog('드라이브 백업', `${fileName} 파일이 구글 드라이브에 업로드됨`);
+            return true;
+        } else {
+            throw new Error('업로드 실패');
+        }
+        
+    } catch (error) {
+        console.error('드라이브 업로드 실패:', error);
+        alert('구글 드라이브 업로드에 실패했습니다: ' + error.message);
+        return false;
+    }
+}
+
+// 구글 드라이브에 백업
+async function backupToGoogleDrive() {
+    const backupData = {
+        members: membersData,
+        settings: {
+            currentPassword: document.getElementById('currentPassword')?.textContent || '',
+            lastMaintenance: localStorage.getItem('lastMaintenance')
+        },
+        logs: activityLogs,
+        backupDate: new Date().toISOString(),
+        version: '1.0'
+    };
+    
+    const fileName = `backup-${getCurrentDateString()}-${Date.now()}.json`;
+    const content = JSON.stringify(backupData, null, 2);
+    
+    const success = await uploadToDrive(content, fileName, 'application/json');
+    
+    if (success) {
+        alert('✅ 구글 드라이브 백업이 완료되었습니다!\n폴더: SEO도구백업');
+    }
+}
+
+// CSV를 구글 드라이브에 업로드
+async function exportMembersToGoogleDrive() {
+    const headers = ['닉네임', '카톡명', '블로그주소', '상태', '가입일', '마지막활동', '사용횟수'];
+    const csvContent = [
+        headers.join(','),
+        ...membersData.map(member => [
+            member.nickname,
+            member.chatName,
+            member.blogUrl,
+            member.status === 'approved' ? '승인됨' : '대기중',
+            member.joinDate,
+            member.lastActive,
+            member.requestCount
+        ].join(','))
+    ].join('\n');
+    
+    const fileName = `members-${getCurrentDateString()}.csv`;
+    
+    const success = await uploadToDrive(csvContent, fileName, 'text/csv');
+    
+    if (success) {
+        alert('✅ 멤버 목록이 구글 드라이브에 업로드되었습니다!');
+    }
+}
+
+// 드라이브 폴더 열기
+function openDriveBackupFolder() {
+    const driveUrl = 'https://drive.google.com/drive/folders/';
+    // 실제로는 백업 폴더 ID를 알아야 하지만, 일반적인 드라이브로 이동
+    window.open('https://drive.google.com/drive/my-drive', '_blank');
+    
+    alert('구글 드라이브가 열렸습니다.\n"SEO도구백업" 폴더를 찾아보세요.');
+}
+
+// 자동 백업 설정
+function setupAutoBackup() {
+    const autoBackup = localStorage.getItem('autoBackupEnabled') === 'true';
+    
+    if (autoBackup) {
+        // 매일 자정에 자동 백업 (실제로는 페이지 접속시)
+        const lastAutoBackup = localStorage.getItem('lastAutoBackup');
+        const today = new Date().toDateString();
+        
+        if (lastAutoBackup !== today) {
+            // 하루에 한 번 자동 백업
+            setTimeout(async () => {
+                await backupToGoogleDrive();
+                localStorage.setItem('lastAutoBackup', today);
+            }, 5000); // 5초 후 실행
+        }
+    }
+}
+
+// 자동 백업 토글
+function toggleAutoBackup() {
+    const current = localStorage.getItem('autoBackupEnabled') === 'true';
+    const newState = !current;
+    
+    localStorage.setItem('autoBackupEnabled', newState.toString());
+    
+    const button = document.getElementById('autoBackupBtn');
+    if (button) {
+        button.textContent = newState ? '🔄 자동백업 켜짐' : '⏸️ 자동백업 꺼짐';
+        button.className = newState ? 'btn btn-success' : 'btn btn-secondary';
+    }
+    
+    alert(newState ? 
+        '✅ 자동 백업이 활성화되었습니다!\n매일 구글 드라이브에 백업됩니다.' : 
+        '⏸️ 자동 백업이 비활성화되었습니다.'
+    );
+}
+
+// 페이지 로드시 구글 드라이브 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    // 기존 코드...
+    
+    // 구글 드라이브 초기화
+    initializeGoogleDrive();
+    
+    // 자동 백업 확인
+    setupAutoBackup();
+});
+
+// 기존 백업 함수들 수정
+const originalBackupAllData = backupAllData;
+const originalExportMembersCSV = exportMembersCSV;
+
+// 로컬 + 드라이브 백업
+backupAllData = async function() {
+    // 로컬 백업
+    originalBackupAllData();
+    
+    // 드라이브 백업 여부 확인
+    const toDrive = confirm('구글 드라이브에도 백업하시겠습니까?');
+    if (toDrive) {
+        await backupToGoogleDrive();
+    }
+};
+
+// 로컬 + 드라이브 내보내기
+exportMembersCSV = async function() {
+    // 로컬 내보내기
+    originalExportMembersCSV();
+    
+    // 드라이브 업로드 여부 확인
+    const toDrive = confirm('구글 드라이브에도 업로드하시겠습니까?');
+    if (toDrive) {
+        await exportMembersToGoogleDrive();
+    }
+};
     </script>
 </body>
 </html>
