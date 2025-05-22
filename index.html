@@ -511,8 +511,12 @@ https://example.com/page3"></textarea>
         // 탭 전환
         function showTab(tabName) {
             // 모든 탭 비활성화
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(function(content) {
+                content.classList.remove('active');
+            });
             
             // 선택된 탭 활성화
             event.target.classList.add('active');
@@ -544,7 +548,7 @@ https://example.com/page3"></textarea>
         function loadSettings() {
             const saved = localStorage.getItem('indexingSettings');
             if (saved) {
-                settings = { ...settings, ...JSON.parse(saved) };
+                settings = Object.assign({}, settings, JSON.parse(saved));
             }
         }
 
@@ -555,7 +559,7 @@ https://example.com/page3"></textarea>
             document.getElementById('site-description').value = settings.site.description || '';
 
             // 플랫폼 설정 업데이트
-            Object.keys(settings.platforms).forEach(platform => {
+            Object.keys(settings.platforms).forEach(function(platform) {
                 const platformSettings = settings.platforms[platform];
                 const toggle = document.getElementById(platform + '-toggle');
                 const settingsDiv = document.getElementById(platform + '-settings');
@@ -636,7 +640,7 @@ https://example.com/page3"></textarea>
             reader.onload = function(e) {
                 try {
                     const importedSettings = JSON.parse(e.target.result);
-                    settings = { ...settings, ...importedSettings };
+                    settings = Object.assign({}, settings, importedSettings);
                     saveSettings();
                     updateUI();
                     addLog('📥 설정 파일을 불러왔습니다.');
@@ -647,10 +651,10 @@ https://example.com/page3"></textarea>
             reader.readAsText(file);
         }
 
-        // 연결 테스트
+        // 연결 테스트 (수정된 버전 - 일반 함수 사용)
         function testGoogleConnection() {
             addLog('🔵 Google Search Console 연결을 테스트 중...');
-            setTimeout(() => {
+            setTimeout(function() {
                 settings.platforms.google.connected = true;
                 updateConnectionStatus('google', 'connected');
                 addLog('✅ Google Search Console 연결 성공!');
@@ -660,7 +664,7 @@ https://example.com/page3"></textarea>
 
         function testBingConnection() {
             addLog('🟦 Bing Webmaster Tools 연결을 테스트 중...');
-            setTimeout(() => {
+            setTimeout(function() {
                 settings.platforms.bing.connected = true;
                 updateConnectionStatus('bing', 'connected');
                 addLog('✅ Bing Webmaster Tools 연결 성공!');
@@ -670,7 +674,7 @@ https://example.com/page3"></textarea>
 
         function testNaverConnection() {
             addLog('🟢 네이버 서치어드바이저 연결을 테스트 중...');
-            setTimeout(() => {
+            setTimeout(function() {
                 settings.platforms.naver.connected = true;
                 updateConnectionStatus('naver', 'connected');
                 addLog('✅ 네이버 서치어드바이저 연결 성공!');
@@ -687,7 +691,9 @@ https://example.com/page3"></textarea>
 
         // 색인 요청
         function startIndexing() {
-            const urls = document.getElementById('index-urls').value.split('\n').filter(url => url.trim());
+            const urls = document.getElementById('index-urls').value.split('\n').filter(function(url) {
+                return url.trim();
+            });
             const googleEnabled = document.getElementById('index-google').checked;
             const bingEnabled = document.getElementById('index-bing').checked;
             const naverEnabled = document.getElementById('index-naver').checked;
@@ -703,27 +709,30 @@ https://example.com/page3"></textarea>
             }
             
             addLog('🚀 색인 요청을 시작합니다...');
-            addLog(`📝 총 ${urls.length}개 URL, 플랫폼: ${googleEnabled ? 'Google ' : ''}${bingEnabled ? 'Bing ' : ''}${naverEnabled ? 'Naver ' : ''}`);
+            addLog('📝 총 ' + urls.length + '개 URL, 플랫폼: ' + 
+                   (googleEnabled ? 'Google ' : '') + 
+                   (bingEnabled ? 'Bing ' : '') + 
+                   (naverEnabled ? 'Naver ' : ''));
             
             let completed = 0;
             const total = urls.length * ((googleEnabled ? 1 : 0) + (bingEnabled ? 1 : 0) + (naverEnabled ? 1 : 0));
             
-            urls.forEach((url, index) => {
-                setTimeout(() => {
+            urls.forEach(function(url, index) {
+                setTimeout(function() {
                     if (googleEnabled) {
-                        simulateIndexRequest('Google', url, () => {
+                        simulateIndexRequest('Google', url, function() {
                             completed++;
                             updateProgress(completed, total);
                         });
                     }
                     if (bingEnabled) {
-                        simulateIndexRequest('Bing', url, () => {
+                        simulateIndexRequest('Bing', url, function() {
                             completed++;
                             updateProgress(completed, total);
                         });
                     }
                     if (naverEnabled) {
-                        simulateIndexRequest('Naver', url, () => {
+                        simulateIndexRequest('Naver', url, function() {
                             completed++;
                             updateProgress(completed, total);
                         });
@@ -738,14 +747,14 @@ https://example.com/page3"></textarea>
         }
 
         function simulateIndexRequest(platform, url, callback) {
-            addLog(`🔄 ${platform}: ${url} 색인 요청 중...`);
-            setTimeout(() => {
+            addLog('🔄 ' + platform + ': ' + url + ' 색인 요청 중...');
+            setTimeout(function() {
                 const success = Math.random() > 0.1; // 90% 성공률
                 if (success) {
-                    addLog(`✅ ${platform}: ${url} 색인 요청 성공`);
+                    addLog('✅ ' + platform + ': ' + url + ' 색인 요청 성공');
                     settings.stats.successCount++;
                 } else {
-                    addLog(`❌ ${platform}: ${url} 색인 요청 실패`);
+                    addLog('❌ ' + platform + ': ' + url + ' 색인 요청 실패');
                 }
                 callback();
             }, 1000 + Math.random() * 2000);
@@ -757,7 +766,7 @@ https://example.com/page3"></textarea>
             
             if (completed === total) {
                 addLog('🎉 모든 색인 요청이 완료되었습니다!');
-                setTimeout(() => {
+                setTimeout(function() {
                     document.getElementById('progress-fill').style.width = '0%';
                 }, 3000);
             }
@@ -771,9 +780,9 @@ https://example.com/page3"></textarea>
             }
             
             addLog('🗺️ 사이트맵 제출을 시작합니다...');
-            addLog(`📍 사이트맵: ${settings.site.sitemap}`);
+            addLog('📍 사이트맵: ' + settings.site.sitemap);
             
-            setTimeout(() => {
+            setTimeout(function() {
                 addLog('✅ 사이트맵 제출이 완료되었습니다.');
             }, 3000);
         }
@@ -782,7 +791,7 @@ https://example.com/page3"></textarea>
         function addLog(message) {
             const logArea = document.getElementById('log-area');
             const now = new Date().toLocaleTimeString();
-            logArea.innerHTML += `[${now}] ${message}<br>`;
+            logArea.innerHTML += '[' + now + '] ' + message + '<br>';
             logArea.scrollTop = logArea.scrollHeight;
         }
 
@@ -790,8 +799,8 @@ https://example.com/page3"></textarea>
         function checkAllConnections() {
             addLog('🔄 모든 연결 상태를 확인 중...');
             
-            Object.keys(settings.platforms).forEach(platform => {
-                setTimeout(() => {
+            Object.keys(settings.platforms).forEach(function(platform) {
+                setTimeout(function() {
                     const connected = settings.platforms[platform].connected;
                     updateConnectionStatus(platform, connected ? 'connected' : 'disconnected');
                 }, Math.random() * 2000);
@@ -806,9 +815,9 @@ https://example.com/page3"></textarea>
                 return;
             }
             
-            addLog(`🔗 사이트 접근 테스트 중... ${siteUrl}`);
+            addLog('🔗 사이트 접근 테스트 중... ' + siteUrl);
             
-            setTimeout(() => {
+            setTimeout(function() {
                 addLog('✅ 사이트 접근이 정상적으로 확인되었습니다.');
             }, 2000);
         }
