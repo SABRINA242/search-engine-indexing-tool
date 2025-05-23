@@ -985,7 +985,7 @@
 
         // 구글 로그인 버튼 클릭
         function signInToGoogle() {
-            // 간단하게 구글 로그인 URL로 이동
+            // 구글 로그인 URL (간단하게)
             const loginUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=https://www.googleapis.com/auth/spreadsheets&access_type=offline`;
             
             // 현재 창에서 구글 로그인 페이지로 이동
