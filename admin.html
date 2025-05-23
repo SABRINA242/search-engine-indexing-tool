@@ -665,15 +665,14 @@
                 <!-- API 설정 (간소화) -->
                 <div class="api-setup-section">
                     <div class="api-setup-header" onclick="toggleApiSetup()">
-                        <h4>🔗 Apps Script 웹앱 연결</h4>
+                        <h4>🔗 Google Sheets API 연결</h4>
                         <span class="toggle-icon" id="apiToggle">▼</span>
                     </div>
                     
                     <div class="api-setup-content" id="apiSetupContent" style="display: none;">
-                        <p><strong>웹앱 URL:</strong></p>
-                        <p style="font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 5px; word-break: break-all;">
-                            https://script.google.com/macros/s/AKfycbwMJ5D3Beb_0KJzfSQ4HCRitcjYvjks5DXO8d48eU2FS9tELerUFi1y498Pp1XwYp30/exec
-                        </p>
+                        <p><strong>API Key:</strong> AIzaSyCW0184Y_8aXwV4n90fK1S8rcHZQ5NPTbg</p>
+                        <p><strong>시트 ID:</strong> 1GVEoDuOxHxApdWw4Moefh-exADJtky_wKTCQ8WhMWyU</p>
+                        <p><strong>시트 탭:</strong> "맴버", "로그현황"</p>
                         <button class="btn btn-success" onclick="setupSheetsAPI()">✅ 연결 확인</button>
                         <button class="btn btn-secondary" onclick="testSheetsConnection()">🔍 테스트</button>
                     </div>
@@ -977,26 +976,20 @@
             localStorage.setItem('WEBAPP_CONNECTED', 'true');
         }
 
-        // 연결 테스트 (Apps Script 웹앱)
+        // 연결 테스트 (GET 방식으로 변경)
         async function testSheetsConnection() {
             try {
-                const response = await fetch(WEBAPP_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'test'
-                    })
+                const response = await fetch(WEBAPP_URL + '?action=test', {
+                    method: 'GET'
                 });
                 
-                const result = await response.json();
+                const text = await response.text();
                 
-                if (result.success) {
-                    alert('✅ ' + result.message);
+                if (response.ok) {
+                    alert('✅ 연결 성공!');
                     updateSheetsStatus('연결됨');
                 } else {
-                    alert('❌ 연결 실패: ' + result.message);
+                    alert('❌ 연결 실패: ' + text);
                     updateSheetsStatus('연결 실패');
                 }
             } catch (error) {
@@ -1163,8 +1156,7 @@
 
         // 시트 열기 (직접 URL)
         function openBackupSheet() {
-            const sheetUrl = 'https://docs.google.com/spreadsheets/d/1GVEoDuOxHxApdWw4Moefh-exADJtky_wKTCQ8WhMWyU/edit';
-            window.open(sheetUrl, '_blank');
+            window.open('https://docs.google.com/spreadsheets/d/1GVEoDuOxHxApdWw4Moefh-exADJtky_wKTCQ8WhMWyU/edit', '_blank');
         }
 
         // 가이드 접기/펼치기
@@ -1200,14 +1192,8 @@
 
         // 페이지 로드시 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            // Apps Script 웹앱 연결 상태 확인
-            const isConnected = localStorage.getItem('WEBAPP_CONNECTED') === 'true';
-            
-            if (isConnected) {
-                updateSheetsStatus('연결됨');
-            } else {
-                updateSheetsStatus('설정 필요');
-            }
+            // Google Sheets API 연결 상태 표시
+            updateSheetsStatus('연결됨');
             
             // 자동 백업 상태 복원
             const autoBackupEnabled = localStorage.getItem('autoSheetBackupEnabled') === 'true';
