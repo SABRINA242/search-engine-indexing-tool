@@ -435,34 +435,6 @@
             margin-top: 5px;
         }
 
-        .copy-btn {
-            background: #17a2b8;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
-
-        .copy-btn:hover {
-            background: #138496;
-        }
-
-        #memberInstructions {
-            width: 100%;
-            background: #f8f9fa;
-            border: 2px solid #dc3545;
-            border-radius: 5px;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            resize: vertical;
-        }
-
-        /* 시트 관련 추가 스타일 */
         .api-setup-section {
             background: #e8f5e8;
             padding: 15px;
@@ -488,6 +460,18 @@
             margin-top: 15px;
         }
 
+        #memberInstructions {
+            width: 100%;
+            background: #f8f9fa;
+            border: 2px solid #dc3545;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            resize: vertical;
+        }
+
         @media (max-width: 768px) {
             .drive-actions, .drive-settings {
                 flex-direction: column;
@@ -495,6 +479,16 @@
             
             .drive-actions button, .drive-settings button {
                 width: 100%;
+            }
+        }
+
+        // 상태 업데이트
+        function updateSheetsStatus(status) {
+            const statusElement = document.getElementById('sheetsStatus');
+            if (statusElement) {
+                statusElement.textContent = status;
+                const connectedStates = ['연결됨', '로그인됨'];
+                statusElement.className = connectedStates.includes(status) ? 'drive-connected' : 'drive-disconnected';
             }
         }
     </style>
@@ -654,7 +648,7 @@
                 <div class="drive-status">
                     <div class="status-item">
                         <span>시트 연결 상태:</span>
-                        <span id="sheetsStatus" class="drive-disconnected">설정 안됨</span>
+                        <span id="sheetsStatus" class="drive-disconnected">초기화 중...</span>
                     </div>
                     <div class="status-item">
                         <span>자동 백업:</span>
@@ -662,17 +656,23 @@
                     </div>
                 </div>
                 
-                <!-- API 설정 (간소화) -->
+                <!-- API 설정 (OAuth 로그인) -->
                 <div class="api-setup-section">
                     <div class="api-setup-header" onclick="toggleApiSetup()">
-                        <h4>🔗 Google Sheets API 연결</h4>
+                        <h4>🔗 구글 로그인 및 API 연결</h4>
                         <span class="toggle-icon" id="apiToggle">▼</span>
                     </div>
                     
                     <div class="api-setup-content" id="apiSetupContent" style="display: none;">
-                        <p><strong>API Key:</strong> AIzaSyCW0184Y_8aXwV4n90fK1S8rcHZQ5NPTbg</p>
+                        <p><strong>Client ID:</strong> 52917675618-500n100umfouoes2m0a5l9jquj148ccn.apps.googleusercontent.com</p>
                         <p><strong>시트 ID:</strong> 1GVEoDuOxHxApdWw4Moefh-exADJtky_wKTCQ8WhMWyU</p>
                         <p><strong>시트 탭:</strong> "맴버", "로그현황"</p>
+                        
+                        <div style="margin: 15px 0;">
+                            <button class="btn btn-primary" onclick="signInToGoogle()">🔑 구글 로그인</button>
+                            <button class="btn btn-secondary" onclick="signOutFromGoogle()">🚪 로그아웃</button>
+                        </div>
+                        
                         <button class="btn btn-success" onclick="setupSheetsAPI()">✅ 연결 확인</button>
                         <button class="btn btn-secondary" onclick="testSheetsConnection()">🔍 테스트</button>
                     </div>
@@ -692,14 +692,14 @@
                 </div>
                 
                 <div class="drive-info">
-                    <h4>💡 구글 시트 백업 장점</h4>
+                    <h4>💡 구글 OAuth 로그인 백업 시스템</h4>
                     <ul>
+                        <li>🔑 먼저 구글 계정으로 로그인 필요</li>
+                        <li>✅ 로그인 후 시트 접근 권한 승인</li>
                         <li>✅ 실시간 데이터 확인 및 관리</li>
                         <li>✅ 표 형태로 직관적인 데이터 보기</li>
                         <li>✅ 다른 관리자와 실시간 공유</li>
-                        <li>✅ 필터링, 정렬, 검색 기능</li>
                         <li>✅ "맴버"와 "로그현황" 탭에 정리</li>
-                        <li>✅ 모바일에서도 쉽게 확인</li>
                     </ul>
                 </div>
             </div>
@@ -828,6 +828,85 @@
     </div>
 
     <script>
+        // Google OAuth 설정
+        const CLIENT_ID = '52917675618-500n100umfouoes2m0a5l9jquj148ccn.apps.googleusercontent.com';
+        const API_KEY = 'AIzaSyCW0184Y_8aXwV4n90fK1S8rcHZQ5NPTbg';
+        const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+        const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+        const SHEET_ID = '1GVEoDuOxHxApdWw4Moefh-exADJtky_wKTCQ8WhMWyU';
+
+        let isGoogleAPIReady = false;
+        let isSignedIn = false;
+
+        // Google API 로드
+        async function initializeGoogleAPI() {
+            try {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://apis.google.com/js/api.js';
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+
+                await new Promise((resolve) => {
+                    gapi.load('auth2:client', resolve);
+                });
+
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    clientId: CLIENT_ID,
+                    discoveryDocs: [DISCOVERY_DOC],
+                    scope: SCOPES
+                });
+
+                isGoogleAPIReady = true;
+                
+                // 로그인 상태 확인
+                const authInstance = gapi.auth2.getAuthInstance();
+                isSignedIn = authInstance.isSignedIn.get();
+                
+                updateSheetsStatus(isSignedIn ? '로그인됨' : '로그인 필요');
+                
+            } catch (error) {
+                console.error('Google API 초기화 실패:', error);
+                updateSheetsStatus('초기화 실패');
+            }
+        }
+
+        // 구글 로그인
+        async function signInToGoogle() {
+            if (!isGoogleAPIReady) {
+                alert('Google API가 준비되지 않았습니다.');
+                return;
+            }
+
+            try {
+                const authInstance = gapi.auth2.getAuthInstance();
+                await authInstance.signIn();
+                
+                isSignedIn = true;
+                updateSheetsStatus('로그인됨');
+                alert('✅ 구글 로그인 성공!\n이제 백업 기능을 사용할 수 있습니다.');
+                
+            } catch (error) {
+                console.error('로그인 실패:', error);
+                alert('❌ 구글 로그인에 실패했습니다.');
+            }
+        }
+
+        // 구글 로그아웃  
+        function signOutFromGoogle() {
+            if (!isGoogleAPIReady) return;
+            
+            const authInstance = gapi.auth2.getAuthInstance();
+            authInstance.signOut();
+            
+            isSignedIn = false;
+            updateSheetsStatus('로그아웃됨');
+            alert('로그아웃되었습니다.');
+        }
+
         // 관리자 로그인
         function adminLogin() {
             const password = document.getElementById('adminPassword').value;
@@ -966,158 +1045,115 @@
             }
         }
 
-        // Apps Script 웹앱 URL 설정
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwMJ5D3Beb_0KJzfSQ4HCRitcjYvjks5DXO8d48eU2FS9tELerUFi1y498Pp1XwYp30/exec';
-
-        // API 설정 (이제 웹앱 URL만 사용)
+        // API 설정 (OAuth 로그인)
         function setupSheetsAPI() {
-            alert('✅ Apps Script 웹앱이 설정되었습니다!');
-            updateSheetsStatus('연결됨');
-            localStorage.setItem('WEBAPP_CONNECTED', 'true');
+            if (!isGoogleAPIReady) {
+                alert('Google API를 초기화 중입니다...');
+                return;
+            }
+            
+            if (!isSignedIn) {
+                alert('먼저 구글에 로그인해주세요.');
+                return;
+            }
+            
+            alert('✅ API 연결 완료! 백업 기능을 사용할 수 있습니다.');
         }
 
-        // 연결 테스트 (GET 방식으로 변경)
+        // 연결 테스트 (OAuth 기반)
         async function testSheetsConnection() {
+            if (!isSignedIn) {
+                alert('❌ 먼저 구글에 로그인해주세요!');
+                return;
+            }
+
             try {
-                const response = await fetch(WEBAPP_URL + '?action=test', {
-                    method: 'GET'
+                const response = await gapi.client.sheets.spreadsheets.get({
+                    spreadsheetId: SHEET_ID
                 });
                 
-                const text = await response.text();
+                alert('✅ 연결 성공! 시트에 접근할 수 있습니다.');
+                updateSheetsStatus('연결됨');
                 
-                if (response.ok) {
-                    alert('✅ 연결 성공!');
-                    updateSheetsStatus('연결됨');
-                } else {
-                    alert('❌ 연결 실패: ' + text);
-                    updateSheetsStatus('연결 실패');
-                }
             } catch (error) {
-                alert('❌ 연결 오류: ' + error.message);
+                console.error('연결 테스트 실패:', error);
+                alert('❌ 연결 실패: ' + error.message);
                 updateSheetsStatus('연결 실패');
             }
         }
 
-        // 상태 업데이트
-        function updateSheetsStatus(status) {
-            const statusElement = document.getElementById('sheetsStatus');
-            if (statusElement) {
-                statusElement.textContent = status;
-                statusElement.className = status === '연결됨' ? 'drive-connected' : 'drive-disconnected';
-            }
-        }
-
-        // 멤버 데이터 백업 (Apps Script 웹앱)
+        // 멤버 데이터 백업 (OAuth 기반)
         async function backupMembersToSheet() {
+            if (!isSignedIn) {
+                alert('❌ 먼저 구글에 로그인해주세요!');
+                return;
+            }
+
             try {
-                // 더미 멤버 데이터 (실제로는 Firebase에서 가져오기)
-                const memberData = [
-                    {
-                        chatName: '홍길동',
-                        nickname: '중년라이프',
-                        blogUrl: 'https://middleage.blog.com',
-                        status: 'pending',
-                        joinDate: '2024-05-22',
-                        lastActive: '2024-05-23',
-                        requestCount: 5
-                    },
-                    {
-                        chatName: '김영희',
-                        nickname: '블로그마스터',
-                        blogUrl: 'https://master.blog.com',
-                        status: 'approved',
-                        joinDate: '2024-05-21',
-                        lastActive: '2024-05-23',
-                        requestCount: 12
-                    },
-                    {
-                        chatName: '박철수',
-                        nickname: 'SEO전문가',
-                        blogUrl: 'https://seo.expert.com',
-                        status: 'approved',
-                        joinDate: '2024-05-20',
-                        lastActive: '2024-05-22',
-                        requestCount: 8
-                    }
+                const values = [
+                    ['카톡명', '닉네임', '블로그주소', '상태', '가입일', '마지막활동', '사용횟수', '백업일시'],
+                    ['홍길동', '중년라이프', 'https://middleage.blog.com', '대기중', '2024-05-22', '2024-05-23', '5', new Date().toLocaleString('ko-KR')],
+                    ['김영희', '블로그마스터', 'https://master.blog.com', '승인됨', '2024-05-21', '2024-05-23', '12', new Date().toLocaleString('ko-KR')],
+                    ['박철수', 'SEO전문가', 'https://seo.expert.com', '승인됨', '2024-05-20', '2024-05-22', '8', new Date().toLocaleString('ko-KR')]
                 ];
 
-                const response = await fetch(WEBAPP_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'backupMembers',
-                        members: memberData
-                    })
+                await gapi.client.sheets.spreadsheets.values.update({
+                    spreadsheetId: SHEET_ID,
+                    range: '맴버!A1:H4',
+                    valueInputOption: 'RAW',
+                    resource: {
+                        values: values
+                    }
                 });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ ' + result.message);
-                } else {
-                    alert('❌ 백업 실패: ' + result.message);
-                }
+
+                alert('✅ 멤버 3명 백업 완료!');
                 
             } catch (error) {
-                alert('❌ 백업 중 오류: ' + error.message);
+                console.error('멤버 백업 실패:', error);
+                alert('❌ 백업 실패: ' + error.message);
             }
         }
 
-        // 활동로그 백업 (Apps Script 웹앱)
+        // 활동로그 백업 (OAuth 기반)
         async function backupLogsToSheet() {
+            if (!isSignedIn) {
+                alert('❌ 먼저 구글에 로그인해주세요!');
+                return;
+            }
+
             try {
-                // 더미 로그 데이터
-                const logData = [
-                    {
-                        timestamp: '2024-05-23 14:30',
-                        action: '멤버 가입',
-                        details: '새 멤버 가입: 중년라이프'
-                    },
-                    {
-                        timestamp: '2024-05-23 13:45',
-                        action: '멤버 승인',
-                        details: '멤버 승인: 블로그마스터'
-                    },
-                    {
-                        timestamp: '2024-05-23 12:20',
-                        action: '암호 변경',
-                        details: '인증 암호 변경됨'
-                    },
-                    {
-                        timestamp: new Date().toLocaleString('ko-KR'),
-                        action: '백업 실행',
-                        details: '구글 시트 백업 완료'
-                    }
+                const values = [
+                    ['시간', '액션', '내용'],
+                    ['2024-05-23 14:30', '멤버 가입', '새 멤버 가입: 중년라이프'],
+                    ['2024-05-23 13:45', '멤버 승인', '멤버 승인: 블로그마스터'],
+                    ['2024-05-23 12:20', '암호 변경', '인증 암호 변경됨'],
+                    [new Date().toLocaleString('ko-KR'), '백업 실행', '구글 시트 백업 완료']
                 ];
 
-                const response = await fetch(WEBAPP_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'backupLogs',
-                        logs: logData
-                    })
+                await gapi.client.sheets.spreadsheets.values.update({
+                    spreadsheetId: SHEET_ID,
+                    range: '로그현황!A1:C5',
+                    valueInputOption: 'RAW',
+                    resource: {
+                        values: values
+                    }
                 });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ ' + result.message);
-                } else {
-                    alert('❌ 로그 백업 실패: ' + result.message);
-                }
+
+                alert('✅ 로그 4건 백업 완료!');
                 
             } catch (error) {
-                alert('❌ 로그 백업 중 오류: ' + error.message);
+                console.error('로그 백업 실패:', error);
+                alert('❌ 로그 백업 실패: ' + error.message);
             }
         }
 
-        // 전체 백업
+        // 전체 백업 (OAuth 기반)
         async function backupAllToGoogleSheets() {
+            if (!isSignedIn) {
+                alert('❌ 먼저 구글에 로그인해주세요!');
+                return;
+            }
+
             const confirmBackup = confirm('구글 시트에 전체 데이터를 백업하시겠습니까?\n기존 데이터는 덮어씌워집니다.');
             
             if (!confirmBackup) return;
@@ -1190,10 +1226,20 @@
             });
         }
 
+        // 상태 업데이트
+        function updateSheetsStatus(status) {
+            const statusElement = document.getElementById('sheetsStatus');
+            if (statusElement) {
+                statusElement.textContent = status;
+                const connectedStates = ['연결됨', '로그인됨'];
+                statusElement.className = connectedStates.includes(status) ? 'drive-connected' : 'drive-disconnected';
+            }
+        }
+
         // 페이지 로드시 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            // Google Sheets API 연결 상태 표시
-            updateSheetsStatus('연결됨');
+            // 구글 API 초기화
+            initializeGoogleAPI();
             
             // 자동 백업 상태 복원
             const autoBackupEnabled = localStorage.getItem('autoSheetBackupEnabled') === 'true';
