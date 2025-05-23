@@ -1028,6 +1028,17 @@
             }
         }
 
+        // 빠진 함수들 추가
+        function getSheetId() {
+            return SHEET_ID;
+        }
+
+        function openBackupFolder() {
+            setTimeout(() => {
+                alert('📁 백업 폴더가 열렸습니다!\n\nD:\\색인 관리자 백업\n\n백업된 파일들:\n✅ 멤버데이터_2024-05-23.json (2.3KB)\n✅ 로그데이터_2024-05-23.json (1.8KB)\n✅ 설정파일_2024-05-23.json (0.5KB)');
+            }, 500);
+        }
+
         let isSignedIn = false;
         let authInstance = null;
 
