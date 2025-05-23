@@ -1,7 +1,6 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>alert('파일이 수정되었습니다!');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 패널 - SEO 색인 도구</title>
@@ -1431,6 +1430,12 @@
             );
         }
 
+        // 활동 로그 추가
+        function addActivityLog(type, message) {
+            console.log(`[${type}] ${message} - ${new Date().toLocaleString()}`);
+        }
+        }
+
         // 시트 ID 업데이트
         function updateSheetId() {
             const newSheetId = document.getElementById('sheetIdInput').value.trim();
@@ -1575,9 +1580,4 @@
         function copyInstructions() {
             const instructions = document.getElementById('memberInstructions').value;
             navigator.clipboard.writeText(instructions).then(function() {
-                alert('전체 안내문이 복사되었습니다!\n카톡방에 붙여넣기 하세요.');
-            });
-        }
-    </script>
-</body>
-</html>
+                alert('전체 안내문�
