@@ -703,7 +703,7 @@
                         <li>✅ 표 형태로 직관적인 데이터 보기</li>
                         <li>✅ 다른 관리자와 실시간 공유</li>
                         <li>✅ 필터링, 정렬, 검색 기능</li>
-                        <li>✅ 자동 버전 관리 (구글 기본 제공)</li>
+                        <li>✅ "맴버"와 "로그현황" 탭에 정리</li>
                         <li>✅ 모바일에서도 쉽게 확인</li>
                     </ul>
                 </div>
@@ -1051,7 +1051,7 @@
                 
                 // 시트 업데이트
                 const response = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/멤버목록!A1:H${allData.length}?valueInputOption=RAW&key=${apiKey}`,
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/맴버!A1:H${allData.length}?valueInputOption=RAW&key=${apiKey}`,
                     {
                         method: 'PUT',
                         headers: {
@@ -1100,7 +1100,7 @@
                 
                 // 로그 시트 업데이트
                 const response = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/활동로그!A1:C${allData.length}?valueInputOption=RAW&key=${apiKey}`,
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/로그현황!A1:C${allData.length}?valueInputOption=RAW&key=${apiKey}`,
                     {
                         method: 'PUT',
                         headers: {
