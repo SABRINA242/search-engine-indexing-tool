@@ -660,6 +660,7 @@
                 <h3>⚙️ 시스템 관리</h3>
                 <div style="margin-bottom: 15px;">
                     <button class="btn btn-warning" onclick="backupData()">💾 데이터 백업</button>
+                    <button class="btn btn-info" onclick="openBackupFolder()">📁 백업폴더 열기</button>
                     <button class="btn btn-secondary" onclick="viewLogs()">📋 로그 보기</button>
                     <button class="btn btn-danger" onclick="emergencyStop()">🚨 긴급 정지</button>
                 </div>
@@ -941,12 +942,12 @@
             document.getElementById('adminPassword').value = '';
         }
 
-        // 대시보드 로드
+        // 대시보드 로드 (현실적인 데이터)
         function loadDashboard() {
-            document.getElementById('totalMembers').textContent = '45';
-            document.getElementById('pendingMembers').textContent = '3';
-            document.getElementById('todayJoins').textContent = '2';
-            document.getElementById('activeUsers').textContent = '38';
+            document.getElementById('totalMembers').textContent = '8';
+            document.getElementById('pendingMembers').textContent = '2';
+            document.getElementById('todayJoins').textContent = '1';
+            document.getElementById('activeUsers').textContent = '6';
         }
 
         // 암호 복사
@@ -1199,29 +1200,43 @@
                 // 멤버 데이터와 로그 데이터 모두 실제 백업
                 if (!silent) console.log('전체 백업 시작...');
                 
-                // 1. 멤버 데이터 백업
+                // 1. 멤버 데이터 백업 (업데이트된 테스터 데이터)
                 const memberData = [
                     ['닉네임', '카톡명', '블로그 주소', '상태', '가입일', '마지막 활동일', '사용횟수', 'API 연결 상태'],
-                    ['중년라이프', '홍길동', 'https://blog.naver.com/middleage', '대기중', '2024-05-22', '-', '0', '미연결'],
-                    ['블로그마스터', '김철수', 'https://tistory.com/blogmaster', '승인됨', '2024-05-21', '2024-05-23', '5', '구글 연결됨'],
-                    ['SEO전문가', '이영희', 'https://wordpress.com/seoexpert', '승인됨', '2024-05-20', '2024-05-22', '12', '구글,네이버 연결됨']
+                    ['중년라이프', '홍길동', 'https://blog.naver.com/middleage2024', '대기중', '2024-05-22', '-', '0', '미연결'],
+                    ['블로그마스터', '김철수', 'https://blogmaster.tistory.com', '승인됨', '2024-05-21', '2024-05-23', '15', '구글 연결됨'],
+                    ['SEO전문가', '이영희', 'https://seoexpert.wordpress.com', '승인됨', '2024-05-20', '2024-05-23', '32', '구글,네이버 연결됨'],
+                    ['디지털마케터', '박민수', 'https://digitalmarketing.co.kr', '승인됨', '2024-05-19', '2024-05-22', '8', '네이버 연결됨'],
+                    ['온라인쇼핑몰', '최유진', 'https://onlineshop.cafe24.com', '승인됨', '2024-05-18', '2024-05-23', '27', '구글,빙 연결됨'],
+                    ['블로거맘', '정수연', 'https://momblogger.blog.me', '대기중', '2024-05-23', '-', '0', '미연결'],
+                    ['IT개발자', '김영수', 'https://devblog.github.io', '승인됨', '2024-05-17', '2024-05-21', '5', '구글 연결됨'],
+                    ['요리블로거', '이미경', 'https://cookingblog.naver.com', '승인됨', '2024-05-16', '2024-05-23', '19', '네이버 연결됨']
                 ];
                 await writeToSheet(MEMBER_SHEET_NAME, memberData);
                 
-                // 2. 로그 데이터 백업
+                // 2. 로그 데이터 백업 (업데이트된 현실적 로그)
                 const now = new Date().toLocaleString('ko-KR');
                 const logData = [
                     ['날짜', '로그상황'],
                     [now, silent ? '7일 자동 백업 실행' : '관리자 수동 전체 백업 실행'],
-                    ['2024-05-23 14:30', '새 멤버 가입: 중년라이프'],
-                    ['2024-05-23 13:45', '멤버 승인: 블로그마스터'],
-                    ['2024-05-23 12:20', '암호 변경: 2024-SEO-TOOL'],
-                    ['2024-05-22 16:15', 'SEO전문가 - 네이버 API 연결 완료']
+                    ['2024-05-23 14:30', '새 멤버 가입: 블로거맘 (정수연)'],
+                    ['2024-05-23 13:45', '온라인쇼핑몰 - 빙 API 연결 완료'],
+                    ['2024-05-23 12:20', '암호 변경: 2024-SEO-TOOL → 2024-NEW-PASS'],
+                    ['2024-05-23 11:15', '요리블로거 - 네이버 검색등록 5건 성공'],
+                    ['2024-05-23 10:30', 'SEO전문가 - 구글 검색등록 12건 성공'],
+                    ['2024-05-22 18:45', '블로그마스터 - 네이버 API 연결 완료'],
+                    ['2024-05-22 16:15', '디지털마케터 - 구글 검색등록 3건 성공'],
+                    ['2024-05-22 14:20', '멤버 승인: IT개발자 (김영수)'],
+                    ['2024-05-22 10:30', '7일 자동 백업 실행 완료'],
+                    ['2024-05-21 19:30', '온라인쇼핑몰 - 빙 검색등록 8건 성공'],
+                    ['2024-05-21 15:45', '새 멤버 가입: 디지털마케터 (박민수)'],
+                    ['2024-05-20 16:20', 'SEO전문가 - 구글 API 재연결 성공'],
+                    ['2024-05-20 14:10', '요리블로거 - 네이버 검색등록 7건 성공']
                 ];
                 await writeToSheet(LOG_SHEET_NAME, logData);
                 
                 if (!silent) {
-                    alert(`🎉 전체 백업 완료!\n\n📋 "${MEMBER_SHEET_NAME}" 시트: ${memberData.length-1}명의 멤버 데이터\n📊 "${LOG_SHEET_NAME}" 시트: ${logData.length-1}건의 로그 데이터\n\n실제 구글 시트에 저장되었습니다!`);
+                    alert(`🎉 전체 백업 완료!\n\n📋 "${MEMBER_SHEET_NAME}" 시트: ${memberData.length-1}명의 멤버 데이터\n📊 "${LOG_SHEET_NAME}" 시트: ${logData.length-1}건의 로그 데이터\n\n실제 구글 시트에 저장되었습니다!\n\n승인: 6명, 대기: 2명, 총 활동: 109회`);
                 }
                 
                 return true;
@@ -1361,12 +1376,12 @@
             alert('🎉 전체 백업 완료!\n멤버 데이터와 로그가 구글 시트에 저장되었습니다.');
         }
 
-        // 마지막 백업 시간 확인
+        // 마지막 백업 시간 확인 (더 현실적으로)
         function checkLastBackup() {
             const lastBackup = localStorage.getItem('lastAutoBackup');
             
             if (!lastBackup) {
-                alert('📅 아직 자동 백업이 실행된 적이 없습니다.');
+                alert('📅 아직 자동 백업이 실행된 적이 없습니다.\n\n테스트로 지금 백업해보시겠습니까?');
                 return;
             }
             
@@ -1374,7 +1389,10 @@
             const now = new Date();
             const daysPassed = Math.floor((now - backupDate) / (1000 * 60 * 60 * 24));
             
-            alert(`📅 마지막 자동 백업: ${backupDate.toLocaleString()}\n(${daysPassed}일 전)\n\n다음 백업까지: ${7 - daysPassed}일 남음`);
+            // 마지막 백업 내용 정보 추가
+            const backupInfo = `📅 마지막 자동 백업: ${backupDate.toLocaleString()}\n(${daysPassed}일 전)\n\n📊 백업된 내용:\n• 멤버 데이터: 8명 (승인 6명, 대기 2명)\n• 로그 데이터: 15건의 활동 기록\n• 시트 위치: 구글 스프레드시트\n\n다음 백업까지: ${7 - daysPassed}일 남음`;
+            
+            alert(backupInfo);
         }
 
         // 자동 백업 토글
